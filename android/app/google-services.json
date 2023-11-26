@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "995458264256",
+    "project_id": "status-getter-otto",
+    "storage_bucket": "status-getter-otto.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:995458264256:android:917c84b299a1e24b1bd125",
+        "android_client_info": {
+          "package_name": "com.androidsaver.statusgetter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6BQuTwiBF1e7VuaBRSVkk4X8j1DthT68"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
