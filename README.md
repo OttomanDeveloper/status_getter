@@ -29,6 +29,47 @@ Status Getter is a Flutter app designed to effortlessly save WhatsApp and Busine
 - **Framework:** Flutter
 - **Ads Integration:** Google Mobile Ads
 
+## Installation
+
+Ensure you have the latest Flutter version installed, a minimum of 3.13 or above. You can download Flutter from [here](https://docs.flutter.dev/get-started/install).
+
+Additionally, make sure you have Android Studio installed on your machine. You can download Android Studio [here](https://developer.android.com/studio). For MacBook users, install Xcode from the App Store.
+
+Clone the GitHub repository:
+
+```bash
+git clone https://github.com/OttomanDeveloper/status_getter.git
+```
+
+Navigate to the project directory:
+
+```bash
+cd your_project
+```
+
+Run the following command in the terminal:
+
+```bash
+flutter pub get
+```
+
+The project utilizes Firebase as the backend server.
+Ensure Firebase is well connected with the project to avoid app exceptions.
+
+ <img src="https://github.com/OttomanDeveloper/status_getter/blob/main/repo_images/firestore_db_structure.png">
+
+Now you're ready to go.
+
+## Developer Contact Details
+
+- [Instagram](https://www.instagram.com/ottoman_coder/)
+- [Telegram](https://t.me/ottomancoder)
+- Skype ID: [Join Skype](https://join.skype.com/invite/Udbe33x6J98H)
+- [Facebook Page](https://web.facebook.com/ottomancoder/)
+- [YouTube Channel](https://www.youtube.com/c/OttomanCoder/videos)
+- WhatsApp: `+923041561853`
+- Email: `usman243786@gmail.com`
+
 Feel free to contribute, report issues, or enhance the functionality of Status Getter. Your feedback and collaboration are highly valued.
 
 Let's simplify status saving and video downloading with Status Getter!
