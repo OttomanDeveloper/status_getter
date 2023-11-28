@@ -35,7 +35,7 @@ class WhatsappBloc extends Bloc<WhatsappEvent, WhatsappState> {
       return emit(WhatsAppPermissionDenied());
     }
     // Now try to get WhatsApp status from user Device.
-    final Directory directory = Directory(waUtils.whatsAppPath);
+    final Directory directory = Directory(await waUtils.whatsAppPath);
     // Check if the given directory exists or not
     if (await directory.exists()) {
       // WhatsApp is installed so now get status from device.

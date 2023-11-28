@@ -37,7 +37,7 @@ class BusinessWhatsAppBloc
       return emit(BusinessWhatsAppPermissionDenied());
     }
     // Now try to get BusinessWhatsApp status from user Device.
-    final Directory directory = Directory(waUtils.whatsAppBusinessPath);
+    final Directory directory = Directory(await waUtils.whatsAppBusinessPath);
     // Check if the given directory exists or not
     if (await directory.exists()) {
       // BusinessWhatsApp is installed so now get status from device.
