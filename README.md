@@ -58,6 +58,17 @@ Ensure Firebase is well connected with the project to avoid app exceptions.
 
  <img src="https://github.com/OttomanDeveloper/status_getter/blob/main/repo_images/firestore_db_structure.png">
 
+Firestore Collection name is `settings` and document name is `ads`. Below is document field names and dataTypes.
+
+| Field Name         | Data Type |
+| ------------------ | --------- |
+| appstoreurl        | `String`  |
+| googlebanner       | `String`  |
+| adenable           | `Boolean` |
+| googleinterstitial | `String`  |
+| googlenative       | `String`  |
+| privacyPolicyUrl   | `String`  |
+
 Now you're ready to go.
 
 ## Developer Contact Details
