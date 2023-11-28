@@ -1,5 +1,12 @@
 # Status Getter
 
+<p float="left">
+  <img src="https://github.com/OttomanDeveloper/status_getter/blob/main/repo_images/splash.png" width="200">
+  <img src="https://github.com/OttomanDeveloper/status_getter/blob/main/repo_images/status.png" width="200" />
+  <img src="https://github.com/OttomanDeveloper/status_getter/blob/main/repo_images/downloader.png" width="200" />
+  <img src="https://github.com/OttomanDeveloper/status_getter/blob/main/repo_images/sidebar.png" width="200" />
+</p>
+
 **Overview:**
 Status Getter is a Flutter app designed to effortlessly save WhatsApp and Business WhatsApp statuses directly to your Android device. Beyond its primary functionality, this app also supports seamless video downloading from over 10 of the most popular websites, including YouTube, TikTok, Facebook, Instagram, and more.
 
