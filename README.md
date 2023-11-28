@@ -1,39 +1,40 @@
 # Status Getter
 
-<p float="left">
+<p align="center">
   <img src="https://github.com/OttomanDeveloper/status_getter/blob/main/repo_images/splash.png" width="200">
   <img src="https://github.com/OttomanDeveloper/status_getter/blob/main/repo_images/status.png" width="200" />
   <img src="https://github.com/OttomanDeveloper/status_getter/blob/main/repo_images/downloader.png" width="200" />
   <img src="https://github.com/OttomanDeveloper/status_getter/blob/main/repo_images/sidebar.png" width="200" />
 </p>
 
-**Overview:**
-Status Getter is a Flutter app designed to effortlessly save WhatsApp and Business WhatsApp statuses directly to your Android device. Beyond its primary functionality, this app also supports seamless video downloading from over 10 of the most popular websites, including YouTube, TikTok, Facebook, Instagram, and more.
+## Overview
 
-**Key Features:**
+Status Getter is a powerful Flutter app designed to seamlessly save WhatsApp and Business WhatsApp statuses directly to your Android device. Beyond its primary functionality, this app supports effortless video downloading from over 10 of the most popular websites, including YouTube, TikTok, Facebook, Instagram, and more.
 
-1. **WhatsApp Status Saver:** Save both personal and business WhatsApp statuses with ease.
-2. **Video Downloading:** Enjoy the convenience of downloading videos from a diverse range of platforms.
-3. **Multi-Platform Support:** Compatible with over 10 popular websites, ensuring a versatile video downloading experience.
-4. **Google Mobile Ads:** Implemented Google Mobile Ads to enhance the user experience and support the app's sustainability.
+## Key Features
 
-**How to Use:**
+1. **WhatsApp Status Saver:** Effortlessly save both personal and business WhatsApp statuses.
+2. **Video Downloading:** Conveniently download videos from over 10 popular websites.
+3. **Multi-Platform Support:** Versatile video downloading experience with compatibility across various platforms.
+4. **Google Mobile Ads:** Enhanced user experience with integrated Google Mobile Ads, supporting the app's sustainability.
+
+## How to Use
 
 1. Launch the app and navigate to the desired WhatsApp status.
 2. Save the status directly to your Android device.
 3. Explore and download videos from various platforms by pasting the video link.
 4. Experience uninterrupted video downloading with support for popular websites.
 
-**Technical Details:**
+## Technical Details
 
 - **Framework:** Flutter
 - **Ads Integration:** Google Mobile Ads
 
 ## Installation
 
-Ensure you have the latest Flutter version installed, a minimum of 3.13 or above. You can download Flutter from [here](https://docs.flutter.dev/get-started/install).
+Ensure you have the latest Flutter version installed (minimum 3.13 or above). [Download Flutter](https://docs.flutter.dev/get-started/install).
 
-Additionally, make sure you have Android Studio installed on your machine. You can download Android Studio [here](https://developer.android.com/studio). For MacBook users, install Xcode from the App Store.
+Additionally, make sure you have Android Studio installed. [Download Android Studio](https://developer.android.com/studio). For MacBook users, install Xcode from the App Store.
 
 Clone the GitHub repository:
 
@@ -53,12 +54,11 @@ Run the following command in the terminal:
 flutter pub get
 ```
 
-The project utilizes Firebase as the backend server.
-Ensure Firebase is well connected with the project to avoid app exceptions.
+Ensure Firebase is connected to the project to avoid app exceptions.
 
- <img src="https://github.com/OttomanDeveloper/status_getter/blob/main/repo_images/firestore_db_structure.png">
+<img src="https://github.com/OttomanDeveloper/status_getter/blob/main/repo_images/firestore_db_structure.png">
 
-Firestore Collection name is `settings` and document name is `ads`. Below is document field names and dataTypes.
+Firestore Collection name is `settings` and document name is `ads`. Below are document field names and data types.
 
 | Field Name         | Data Type |
 | ------------------ | --------- |
