@@ -95,9 +95,10 @@ class WaUtils {
 
   /// Get `Thumbnail` from `Video`.
   Future<String> getThumbnail(String path) {
-    return VideoThumbnail.thumbnailFile(video: path).then(
-      (String? value) => value.nullSafe,
-    );
+    return VideoThumbnail.thumbnailFile(
+      video: path,
+      imageFormat: ImageFormat.JPEG,
+    ).then((String? value) => value.nullSafe);
   }
 }
 
