@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
@@ -93,12 +95,37 @@ class WaUtils {
     }
   }
 
+  /// Thumbnail Getter `MethodChannel` Name
+  final MethodChannel _channelId = const MethodChannel(
+    "com.androidsaver.statusgetter/ottomancoder",
+  );
+
+  ///  Thumbnail Method ID
+  final String _methodId = "thumbnail";
+
   /// Get `Thumbnail` from `Video`.
-  Future<String> getThumbnail(String path) {
-    return VideoThumbnail.thumbnailFile(
-      video: path,
-      imageFormat: ImageFormat.JPEG,
-    ).then((String? value) => value.nullSafe);
+  Future<Uint8List?> getThumbnail(String path) {
+    try {
+      // Check if the platform is Android then try to get Thumbnail from Native Written Mehtod.
+      if (Platform.isAndroid) {
+        return _videoToThumbnailIsolate(
+          videoPath: path,
+          method: _methodId,
+          channel: _channelId,
+          token: RootIsolateToken.instance,
+        );
+      }
+      // specify the width of the thumbnail, let the height auto-scaled to keep the source aspect ratio
+      return VideoThumbnail.thumbnailData(
+        video: path,
+        quality: 25,
+        maxWidth: 128,
+        imageFormat: ImageFormat.JPEG,
+      );
+    } catch (e) {
+      e.toString().print("getThumbnail Error:");
+      return Future<Uint8List?>.value(null);
+    }
   }
 }
 
@@ -184,4 +211,41 @@ final class WaPathGeneratorUtil {
 
   /// Represents the path for WhatsApp on Android devices running versions older than Android 10.
   final String _whatsAppLegacyPath = "/WhatsApp/Media/.Statuses";
+}
+
+/// Get Video Thumbnail Image in `Android` Side Using `Isolate`
+Future<Uint8List?> _videoToThumbnailIsolate({
+  int? quality,
+  required String method,
+  required String videoPath,
+  required MethodChannel channel,
+  required RootIsolateToken? token,
+}) {
+  return Isolate.run<Uint8List?>(() async {
+    // if Root Isolate Token is not null then bind it
+    if (token != null) {
+      BackgroundIsolateBinaryMessenger.ensureInitialized(token);
+      DartPluginRegistrant.ensureInitialized();
+    }
+    // Now Try to get video thumbnail
+    try {
+      /// Check if call sent from support platform
+      if (Platform.isAndroid) {
+        /// Invoke or call MethodChannel
+        final data = await channel.invokeMethod(
+          method,
+          <String, dynamic>{'path': videoPath, 'quality': quality},
+        );
+        // Check if response is not null and data type is `Uint8List`
+        if (data != null && data is Uint8List) {
+          "Thumbnail Getter Successfully".print("_videoToThumbnail");
+          return data;
+        }
+      }
+    } on PlatformException catch (e) {
+      e.message.toString().print("_videoToThumbnail Error");
+    }
+    // Return null because paltform is not supported or image failed to compress
+    return null;
+  }).catchError((_) => null);
 }

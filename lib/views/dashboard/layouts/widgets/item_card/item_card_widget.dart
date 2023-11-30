@@ -1,12 +1,11 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:statusgetter/core/extensions/buildcontext/buildcontext_extensions_core.dart';
-import 'package:statusgetter/core/extensions/strings/string_extension_core.dart';
 import 'package:statusgetter/core/functions/utils/utils_fun_core.dart';
 import 'package:statusgetter/meta/colors/colors_meta.dart';
-import 'package:statusgetter/meta/settings/settings_meta.dart';
 import 'package:statusgetter/views/status_saver/image/image_status_saver_view.dart';
 import 'package:statusgetter/views/status_saver/video/video_status_saver_view.dart';
 
@@ -17,79 +16,71 @@ class WhatsAppItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isImage = itemPath.path.endsWith(".jpg");
-    if (isImage) {
-      return _getThumbnail(
-        isImage: isImage,
-        context: context,
-        path: itemPath.path,
-        videoPath: AppSettings.empty,
-      );
-    } else {
-      return FutureBuilder<String>(
-        future: WaUtils().getThumbnail(itemPath.path),
-        builder: (_, AsyncSnapshot<String> snap) {
-          if (snap.connectionState != ConnectionState.done) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snap.hasData && snap.data.isNotEmpty) {
-            return _getThumbnail(
-              isImage: isImage,
-              context: context,
-              path: snap.data.nullSafe,
-              videoPath: itemPath.path,
-            );
-          } else {
-            return const Center(child: Icon(Icons.info));
-          }
-        },
-      );
-    }
-  }
-
-  Widget _getThumbnail({
-    required String path,
-    required bool isImage,
-    required String videoPath,
-    required BuildContext context,
-  }) {
-    return GestureDetector(
-      onTap: () async {
-        if (isImage) {
-          return Navigator.push<void>(
-            context,
-            CupertinoPageRoute(
-              builder: (_) => ImageStatusSaverView(path: path),
-            ),
-          );
-        } else {
-          return Navigator.push<void>(
-            context,
-            CupertinoPageRoute(
-              builder: (_) => VideoStatusSaverView(path: videoPath),
-            ),
-          );
-        }
-      },
-      child: LayoutBuilder(
-        builder: (_, BoxConstraints constraints) {
-          return Container(
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return GestureDetector(
+          onTap: () {
+            if (isImage) {
+              Navigator.push<void>(context, CupertinoPageRoute(
+                builder: (_) {
+                  return ImageStatusSaverView(path: itemPath.path);
+                },
+              ));
+              return;
+            } else {
+              Navigator.push<void>(context, CupertinoPageRoute(
+                builder: (_) {
+                  return VideoStatusSaverView(path: itemPath.path);
+                },
+              ));
+              return;
+            }
+          },
+          child: Container(
             width: constraints.maxWidth,
             height: constraints.maxHeight,
             clipBehavior: Clip.antiAliasWithSaveLayer,
             decoration: BoxDecoration(
               color: context.theme.colorScheme.primary,
+              borderRadius: BorderRadius.circular(10.0),
               border: Border.all(
-                width: 0.5,
+                width: 0.7,
                 color: context.theme.colorScheme.primary,
               ),
-              image: DecorationImage(
-                fit: BoxFit.cover,
-                image: FileImage(File(path)),
-              ),
-              borderRadius: BorderRadius.circular(10.0),
+              image: isImage
+                  ? DecorationImage(
+                      fit: BoxFit.cover,
+                      image: FileImage(File(itemPath.path)),
+                    )
+                  : null,
             ),
             child: Stack(
               clipBehavior: Clip.antiAliasWithSaveLayer,
               children: <Widget>[
+                if (!isImage)
+                  Positioned.fill(
+                    child: FutureBuilder<Uint8List?>(
+                      future: WaUtils().getThumbnail(itemPath.path),
+                      builder: (_, AsyncSnapshot<Uint8List?> s) {
+                        if (s.connectionState != ConnectionState.done) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (s.hasData && s.data != null) {
+                          return Image.memory(
+                            fit: BoxFit.cover,
+                            s.data!,
+                            width: constraints.maxWidth,
+                            height: constraints.maxHeight,
+                          );
+                        } else {
+                          return const Center(
+                            child: Icon(Icons.info),
+                          );
+                        }
+                      },
+                    ),
+                  ),
                 Positioned(
                   top: constraints.maxHeight * 0.03,
                   right: constraints.maxWidth * 0.03,
@@ -109,9 +100,9 @@ class WhatsAppItemCard extends StatelessWidget {
                 ),
               ],
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
