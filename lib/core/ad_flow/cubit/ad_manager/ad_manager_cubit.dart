@@ -18,7 +18,7 @@ class AdManagerCubit extends Cubit<AdManagerState> {
   }
 
   /// Initialize `Ads` SDK
-  void initializeSDK() async {
+  Future<void> initializeSDK() async {
     // Check if SDK is Already Initialize then Reject the request
     if (state is AdManagerGoogle) {
       // Print Details in Debug Console

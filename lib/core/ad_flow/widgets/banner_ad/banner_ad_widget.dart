@@ -31,12 +31,13 @@ class BannerAdState extends State<BannerAdWidget>
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Load Banner Ad
-      return _loadBannerAd();
+      _loadBannerAd();
+      return;
     });
   }
 
   /// Send request to load banner ad
-  void _loadBannerAd() async {
+  Future<void> _loadBannerAd() async {
     // Check if Ad Network is Not Google then Reject the Request
     if (ad.state is AdManagerInitial) {
       // Print Details in Debug Console

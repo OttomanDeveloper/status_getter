@@ -25,7 +25,7 @@ class WhatsappBloc extends Bloc<WhatsappEvent, WhatsappState> {
   final WaUtils waUtils = WaUtils()..getDeviceInfo();
 
   /// Fetch Status from Device Storage
-  void fetchStatus(Emitter<WhatsappState> emit) async {
+  Future<void> fetchStatus(Emitter<WhatsappState> emit) async {
     // Emit Loading State.
     emit(WhatsappLoading());
     // Check permission status. If permission granted then continue the process.

@@ -35,7 +35,7 @@ class WaUtils {
   AndroidDeviceInfo? _androidInfo;
 
   /// Get Android Device Info
-  void getDeviceInfo() async {
+  Future<void> getDeviceInfo() async {
     try {
       _androidInfo ??= await _dInfo.androidInfo;
       return;

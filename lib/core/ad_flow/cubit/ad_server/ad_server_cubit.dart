@@ -18,7 +18,7 @@ class AdServerCubit extends HydratedCubit<AdsModel?> {
   }
 
   /// Send request to server to load data
-  void fetchData() async {
+  Future<void> fetchData() async {
     /// Send request to Initialize SDK
     adManager.initializeSDK();
     // Get Latest Ads Details from Firestore

@@ -101,7 +101,7 @@ mixin SocialDomainMixin {
     final List<LinkModel> links = <LinkModel>[];
     // Start a loop and try to get video links from here
     if (linkGroup.isNotEmpty) {
-      for (Element e in linkGroup) {
+      for (final Element e in linkGroup) {
         links.add(_parseLink(e));
       }
     }

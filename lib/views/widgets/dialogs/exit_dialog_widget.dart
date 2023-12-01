@@ -5,7 +5,7 @@ import 'package:statusgetter/core/extensions/buildcontext/buildcontext_extension
 import 'package:statusgetter/meta/colors/colors_meta.dart';
 import 'package:statusgetter/meta/settings/settings_meta.dart';
 
-void showExitDialog(BuildContext context) async {
+Future<void> showExitDialog(BuildContext context) {
   return showGeneralDialog<void>(
     context: context,
     barrierLabel: AppSettings.empty,

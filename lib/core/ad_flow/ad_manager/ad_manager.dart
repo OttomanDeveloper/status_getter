@@ -31,17 +31,18 @@ class AdManagerFunctions {
   }
 
   /// Show `Interstitial` Ad Based on Active `AD NETWORK`
-  void loadInterstitialAD() {
+  Future<void> loadInterstitialAD() {
     if (adManagerCubit.state is AdManagerGoogle) {
       return _googleInterstitial();
     } else {
       // Print Details in Debug Console
       "Ad isn't Initialized Yet".print("loadInterstitialAD");
+      return Future<void>.value();
     }
   }
 
   /// Loads an Interstitial ad.
-  void _googleInterstitial() async {
+  Future<void> _googleInterstitial() async {
     // Get Interstitial AdUnit
     final String adunit =
         (adManagerCubit.state as AdManagerGoogle).interstitial;

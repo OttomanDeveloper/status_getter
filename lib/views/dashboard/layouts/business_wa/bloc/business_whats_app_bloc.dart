@@ -27,7 +27,7 @@ class BusinessWhatsAppBloc
   final WaUtils waUtils = WaUtils()..getDeviceInfo();
 
   /// Fetch Status from Device Storage
-  void fetchStatus(Emitter<BusinessWhatsAppState> emit) async {
+  Future<void> fetchStatus(Emitter<BusinessWhatsAppState> emit) async {
     // Emit Loading State.
     emit(BusinessWhatsAppLoading());
     // Check permission status. If permission granted then continue the process.
