@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statusgetter/core/functions/get_it/get_it_functions_core.dart';
 import 'package:statusgetter/views/dashboard/layouts/whatsapp/bloc/whatsapp_bloc.dart';
-import 'package:statusgetter/views/dashboard/layouts/widgets/item_card/item_card_widget.dart';
 import 'package:statusgetter/views/dashboard/layouts/widgets/not_installed_text/not_installed_text_widget.dart';
 import 'package:statusgetter/views/dashboard/layouts/widgets/permission_denied/permission_denied_widget.dart';
+import 'package:statusgetter/views/dashboard/layouts/widgets/status_viewer_layout/status_viewer_layout_widget.dart';
 
 class WhatsAppLayoutView extends StatefulWidget {
   const WhatsAppLayoutView({super.key});
@@ -39,24 +39,13 @@ class _WhatsAppLayoutViewState extends State<WhatsAppLayoutView>
           return PermissionDeniedWidget(
             onTap: () {
               _whatsappBloc.add(WhatsappEventAskPermission());
+              return;
             },
           );
         } else if (state is WhatsAppStatusAvailable) {
-          return GridView(
-            scrollDirection: Axis.vertical,
-            padding: const EdgeInsets.all(8.0),
-            clipBehavior: Clip.antiAliasWithSaveLayer,
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-            ),
-            children: List<Widget>.generate(state.status.length, (int index) {
-              return WhatsAppItemCard(itemPath: state.status[index]);
-            }),
+          return StatusViewerLayoutWidget(
+            files: state.status,
+            pageStorageKey: toStringShort(),
           );
         } else {
           return const NotInstalledTextWidget(text: "Please wait...");

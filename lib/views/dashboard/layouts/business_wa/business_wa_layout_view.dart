@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statusgetter/core/functions/get_it/get_it_functions_core.dart';
 import 'package:statusgetter/views/dashboard/layouts/business_wa/bloc/business_whats_app_bloc.dart';
-import 'package:statusgetter/views/dashboard/layouts/widgets/item_card/item_card_widget.dart';
 import 'package:statusgetter/views/dashboard/layouts/widgets/not_installed_text/not_installed_text_widget.dart';
 import 'package:statusgetter/views/dashboard/layouts/widgets/permission_denied/permission_denied_widget.dart';
+import 'package:statusgetter/views/dashboard/layouts/widgets/status_viewer_layout/status_viewer_layout_widget.dart';
 
 class BusinessWhatsAppLayoutView extends StatefulWidget {
   const BusinessWhatsAppLayoutView({super.key});
@@ -41,24 +41,13 @@ class _BusinessWhatsAppLayoutViewState extends State<BusinessWhatsAppLayoutView>
           return PermissionDeniedWidget(
             onTap: () {
               _businessWhatsAppBloc.add(BusinessWhatsAppEventAskPermission());
+              return;
             },
           );
         } else if (state is BusinessWhatsAppStatusAvailable) {
-          return GridView(
-            scrollDirection: Axis.vertical,
-            padding: const EdgeInsets.all(8.0),
-            clipBehavior: Clip.antiAliasWithSaveLayer,
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-            ),
-            children: List<Widget>.generate(state.status.length, (int index) {
-              return WhatsAppItemCard(itemPath: state.status[index]);
-            }),
+          return StatusViewerLayoutWidget(
+            files: state.status,
+            pageStorageKey: toStringShort(),
           );
         } else {
           return const NotInstalledTextWidget(text: "Please wait...");
