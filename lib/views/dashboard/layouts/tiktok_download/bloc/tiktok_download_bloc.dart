@@ -77,16 +77,44 @@ class TiktokDownloadBloc
     });
   }
 
-  /// Validate User Input URL
+  /// Validates a user input URL.
+  ///
+  /// The function checks if the input [value] is empty. If it is, it returns
+  /// an error message indicating that a URL needs to be entered.
+  ///
+  /// Then, it uses a regular expression ([RegExp]) to check if the entered URL
+  /// is in a valid format. The regular expression allows URLs that start with
+  /// 'http', 'https', or 'ftp', followed by '://', and then any valid URL
+  /// characters. If the entered URL doesn't match this pattern, it returns
+  /// an error message indicating that a valid URL is required.
+  ///
+  /// If the [value] is not empty and matches the URL pattern, the function
+  /// returns `null`, indicating that the URL is valid.
+  ///
+  /// Usage example:
+  /// ```dart
+  /// String? validationResult = validateURL('https://example.com');
+  /// if (validationResult != null) {
+  ///   print('Validation Error: $validationResult');
+  /// } else {
+  ///   print('URL is valid.');
+  /// }
+  /// ```
   String? validateURL(String? value) {
+    // Check if the input value is empty
     if (value.isEmpty) {
       return 'Please enter a URL';
     }
+
     // Regular expression for a valid URL
     final RegExp regExp = RegExp(r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$');
+
+    // Check if the entered URL matches the pattern
     if (!regExp.hasMatch(value.nullSafe)) {
       return 'Enter a valid URL';
     }
+
+    // If the URL is not empty and matches the pattern, return null
     return null;
   }
 

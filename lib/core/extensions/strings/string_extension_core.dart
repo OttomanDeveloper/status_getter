@@ -44,28 +44,50 @@ extension StringExtendedExtensions on String? {
   ///
   /// Find TextSize based on Given `String` and `TextStyle`
   ///
-  /// It will calculate how much height this `String` characters will take
+  /// It will calculate how much height this `String` characters will take.
   ///
-  /// `return` data type will be in `TextPainter`
+  /// Parameters:
+  ///   - `maxLines`: An optional parameter to set the maximum number of lines for the text. Defaults to `1`.
+  ///   - `style`: An optional parameter to specify the text style using the `TextStyle` class. Defaults to an empty style.
+  ///   - `maxWidth`: An optional parameter to set the maximum width available for the text. Defaults to `double.infinity`, meaning there's no constraint on width.
+  ///
+  /// Returns:
+  ///   - A `TextPainter` object that contains information about the size and layout of the text.
+  ///
+  /// Example:
+  /// ```dart
+  /// final String text = "Hello, Flutter!";
+  /// final TextStyle myTextStyle = TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold);
+  ///
+  /// final TextPainter painter = text.findSize(style: myTextStyle, maxWidth: 200.0);
+  ///
+  /// // Access size information
+  /// final double textWidth = painter.width;
+  /// final double textHeight = painter.height;
+  /// ```
+
   TextPainter findSize({
     int? maxLines,
     TextStyle? style,
     double? maxWidth,
   }) {
-    // Get TextSpan width text and style
+    // Get TextSpan with text and style
     final TextSpan textSpan = TextSpan(
       text: this,
       style: style ?? const TextStyle(),
     );
-    // Get Text Details in painter Variable
+
+    // Get Text Details in a TextPainter Variable
     final TextPainter painter = TextPainter(
       text: textSpan,
       maxLines: maxLines ?? 1,
       textDirection: TextDirection.ltr,
     );
+
     // Assign Layout details
     painter.layout(maxWidth: maxWidth ?? double.infinity);
-    // return size
+
+    // Return size
     return painter;
   }
 
@@ -114,6 +136,30 @@ extension StringExtendedExtensions on String? {
   /// `openURL`
   ///
   /// Open `URI` in `browser` or `supported apps`
+  ///
+  /// This function takes an optional [Uri] parameter representing the path or URL
+  /// that you want to open. It returns a [Future<bool>] indicating whether the
+  /// operation was successful.
+  ///
+  /// Example Usage:
+  /// ```dart
+  /// Uri uri = Uri.parse("https://example.com");
+  /// bool isOpened = await openURL(path: uri);
+  /// ```
+  ///
+  /// The function first attempts to parse the input [path] into a [Uri]. If the
+  /// parsing is unsuccessful, it defaults to `nullSafe`, which could be the case
+  /// when the input [path] is already a [Uri] or if it is `null`.
+  ///
+  /// It then validates the parsed [url] by checking if it is not `null` and if
+  /// it can be launched using the [canLaunchUrl] function.
+  ///
+  /// If the [url] is valid and can be launched, it invokes the [launchUrl] function
+  /// with the [url] and a specified [mode] (in this case, `LaunchMode.externalApplication`).
+  ///
+  /// If any errors occur during this process, they are caught and printed to the console.
+  ///
+  /// Returns `true` if the [url] was successfully opened, and `false` otherwise.
   Future<bool> openURL({Uri? path}) async {
     try {
       // Parse the `String` into `Uri`

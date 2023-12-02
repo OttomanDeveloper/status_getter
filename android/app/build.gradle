@@ -2,7 +2,7 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
-    id("com.google.gms.google-services")
+    id 'com.google.gms.google-services'
 }
 
 def localProperties = new Properties()
@@ -81,6 +81,6 @@ flutter {
 
 dependencies {
     implementation "androidx.multidex:multidex:2.0.1"
-    implementation("com.google.firebase:firebase-analytics")
-    implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation platform('com.google.firebase:firebase-bom:32.6.0')
 }

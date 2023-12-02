@@ -2,6 +2,7 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:statusgetter/core/ad_flow/cubit/ad_manager/ad_manager_cubit.dart';
 import 'package:statusgetter/core/ad_flow/model/ads/ads_model_core.dart';
 import 'package:statusgetter/core/ad_flow/setting_repo/settings_repository_core.dart';
+import 'package:statusgetter/core/extensions/object/object_extension_core.dart';
 import 'package:statusgetter/core/extensions/strings/string_extension_core.dart';
 import 'package:statusgetter/core/functions/get_it/get_it_functions_core.dart';
 import 'package:statusgetter/meta/constants/storage_constants_meta.dart';
@@ -23,6 +24,8 @@ class AdServerCubit extends HydratedCubit<AdsModel?> {
     adManager.initializeSDK();
     // Get Latest Ads Details from Firestore
     return _repo.fetchAds().then<void>((AdsModel? result) {
+      // Print Ads details into Console.
+      result?.toString().print("Firestore Ads Settings");
       // Emit New Data
       emit(result);
       // Send request to Initialize SDK

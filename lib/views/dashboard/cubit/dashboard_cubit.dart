@@ -18,13 +18,20 @@ class DashboardCubit extends HydratedCubit<int> {
     pageController.dispose();
   }
 
-  /// update the value of `bottomNavIndex`
+  /// Update the value of `bottomNavIndex` and optionally move to the corresponding page.
+  ///
+  /// This method emits the provided event to notify listeners about the change in the bottom navigation index.
+  /// If [movePage] is `true`, it also moves the `PageController` to the corresponding page.
+  ///
+  /// Parameters:
+  /// - [event]: The new index for the bottom navigation.
+  /// - [movePage]: A boolean indicating whether to move the `PageController` to the corresponding page.
   void updateBottomNavIndex(int event, {required bool movePage}) {
-    // Verify user is navigating to a new page. not a new one
+    // Verify the user is navigating to a new page, not the current one
     if (event != state) {
-      // Make sure stream is active
+      // Make sure the stream is active
       emit(event);
-      // Now check if it have to move the page then move it
+      // Now check if it has to move the page, then move it
       if (movePage) {
         pageController.jumpToPage(event);
       }

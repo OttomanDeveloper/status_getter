@@ -35,6 +35,11 @@ class WaUtils {
   AndroidDeviceInfo? _androidInfo;
 
   /// Get Android Device Info
+  /// This function initializes the `_dInfo` plugin and retrieves information about the Android device.
+  /// If the information has not been retrieved before, it stores the result in `_androidInfo`.
+  /// If the information has already been retrieved, it returns the stored information.
+  /// This is an asynchronous operation, so it returns a Future.
+  /// In case of any exceptions, it catches a `PlatformException` and prints an error message.
   Future<void> getDeviceInfo() async {
     try {
       _androidInfo ??= await _dInfo.androidInfo;
@@ -54,25 +59,29 @@ class WaUtils {
     }
   }
 
-  /// The `shouldAskManageExternalPermission` function will return `true` if the Android version is 10 (SDK version 29) or higher.
-  /// The function checks whether `_androidInfo` is not null (indicating that the Android device information is available)
-  /// and whether the SDK version is greater than or equal to 29.
-  /// If both conditions are met, it returns `true`; otherwise, it returns `false`.
+  /// The `shouldAskManageExternalPermission` function determines whether the app should request
+  /// the "MANAGE_EXTERNAL_STORAGE" permission, which is required for accessing media files
+  /// on Android devices with version 10 (SDK version 29) or higher.
+  /// It returns `true` if the conditions for requiring the permission are met, and `false` otherwise.
   bool get shouldAskManageExternalPermission {
-    // Check If android device information is not available then get Device info.
+    // Check if Android device information is not available, then get Device info.
     if (_androidInfo == null) {
       getDeviceInfo();
     }
+
+    // Return `true` if Android information is available and the SDK version is 29 or higher.
     return ((_androidInfo != null) && (_androidInfo!.version.sdkInt >= 29));
   }
 
   /// Create an Instance of `WaPathGeneratorUtil`
   late final WaPathGeneratorUtil _waPathGeneratorUtil = WaPathGeneratorUtil();
 
-  /// Provide `WhatsApp Path` to `Status`
+  /// Provide the path for `WhatsApp Status` based on the app's permission to manage external storage.
   Future<String> get whatsAppPath async {
     final String? path = await _waPathGeneratorUtil
         .whatsAppPath(shouldAskManageExternalPermission);
+
+    // Return the obtained path if not empty; otherwise, fallback to default paths based on permission.
     if (path.nullSafe.isNotEmpty) {
       return path.nullSafe;
     } else if (shouldAskManageExternalPermission) {
@@ -82,10 +91,12 @@ class WaUtils {
     }
   }
 
-  /// Provide `WhatsApp Business Path` to `Status`
+  /// Provide the path for `WhatsApp Business Status` based on the app's permission to manage external storage.
   Future<String> get whatsAppBusinessPath async {
     final String? path = await _waPathGeneratorUtil
         .businessWaPath(shouldAskManageExternalPermission);
+
+    // Return the obtained path if not empty; otherwise, fallback to default paths based on permission.
     if (path.nullSafe.isNotEmpty) {
       return path.nullSafe;
     } else if (shouldAskManageExternalPermission) {
@@ -104,9 +115,21 @@ class WaUtils {
   final String _methodId = "thumbnail";
 
   /// Get `Thumbnail` from `Video`.
+  ///
+  /// This function retrieves a thumbnail image from a video file. It first checks
+  /// if the platform is Android, and if so, it attempts to use a native method
+  /// (_videoToThumbnailIsolate) to fetch the thumbnail. Otherwise, it falls back
+  /// to using the VideoThumbnail plugin for other platforms.
+  ///
+  /// Parameters:
+  /// - `path`: The path to the video file from which to generate the thumbnail.
+  ///
+  /// Returns:
+  /// A `Future` that resolves to a `Uint8List` containing the thumbnail image
+  /// data, or `null` if an error occurs.
   Future<Uint8List?> getThumbnail(String path) {
     try {
-      // Check if the platform is Android then try to get Thumbnail from Native Written Mehtod.
+      // Check if the platform is Android then try to get Thumbnail from Native Written Method.
       if (Platform.isAndroid) {
         return _videoToThumbnailIsolate(
           videoPath: path,
@@ -115,7 +138,10 @@ class WaUtils {
           token: RootIsolateToken.instance,
         );
       }
-      // specify the width of the thumbnail, let the height auto-scaled to keep the source aspect ratio
+
+      // For other platforms, use the VideoThumbnail plugin to get the thumbnail.
+      // Specify the width of the thumbnail, let the height auto-scaled to keep the
+      // source aspect ratio.
       return VideoThumbnail.thumbnailData(
         video: path,
         quality: 25,
@@ -123,6 +149,7 @@ class WaUtils {
         imageFormat: ImageFormat.JPEG,
       );
     } catch (e) {
+      // Log any errors that occur during the process.
       e.toString().print("getThumbnail Error:");
       return Future<Uint8List?>.value(null);
     }
@@ -146,21 +173,40 @@ final class WaPathGeneratorUtil {
     return _instance!;
   }
 
+  /// This asynchronous function retrieves the Android external storage directory path.
+  /// It is designed to work with Android, and it's part of a path generation utility.
+  ///
+  /// The steps include:
+  /// 1. Retrieve the external storage directory path using `getExternalStorageDirectory()`.
+  /// 2. Print the raw path for debugging purposes.
+  /// 3. Check if the directory is not null.
+  /// 4. Convert the directory path into a list of strings.
+  /// 5. Extract the desired path by removing unnecessary parts (from root to "Android").
+  /// 6. Return the modified directory path.
+  ///
+  /// If any error occurs during this process, it will be caught and printed.
+  /// The function returns a Future<String?>, where the String is the Android path or null if there's an error.
   Future<String?> _getAndroidPath() async {
     try {
-      // Get External Storage Directory Path
+      // Step 1: Get External Storage Directory Path
       Directory? directory = await getExternalStorageDirectory();
       directory?.path.print("_getAndroidPath - RawPath");
-      // Make sure directory is not null
+
+      // Step 2: Make sure directory is not null
       if (directory != null) {
-        // Convert directory path into List
+        // Step 3: Convert directory path into List
         final List<String> paths = directory.path.split("/");
+
+        // Step 4: Extract the desired path by removing unnecessary parts (from root to "Android")
         final String newPath =
             paths.sublist(1, paths.indexOf("Android")).join("/");
         directory = Directory(newPath);
+
+        // Step 5: Return the modified directory path
         return directory.path;
       }
     } catch (e) {
+      // Step 6: Print any error that occurs during the process
       e.toString().print("WaPathGeneratorUtil _getAndroidPath Error:");
     }
     return null;
@@ -214,6 +260,8 @@ final class WaPathGeneratorUtil {
 }
 
 /// Get Video Thumbnail Image in `Android` Side Using `Isolate`
+/// This function is used to retrieve a video thumbnail image on the Android side using Isolate.
+/// Isolate is a separate Dart execution context, and using it helps in offloading tasks from the main UI thread.
 Future<Uint8List?> _videoToThumbnailIsolate({
   int? quality,
   required String method,
@@ -227,15 +275,17 @@ Future<Uint8List?> _videoToThumbnailIsolate({
       BackgroundIsolateBinaryMessenger.ensureInitialized(token);
       DartPluginRegistrant.ensureInitialized();
     }
+
     // Now Try to get video thumbnail
     try {
-      /// Check if call sent from support platform
+      /// Check if call sent from the supported platform (Android in this case)
       if (Platform.isAndroid) {
         /// Invoke or call MethodChannel
         final data = await channel.invokeMethod(
           method,
           <String, dynamic>{'path': videoPath, 'quality': quality},
         );
+
         // Check if response is not null and data type is `Uint8List`
         if (data != null && data is Uint8List) {
           "Thumbnail Getter Successfully".print("_videoToThumbnail");
@@ -243,9 +293,11 @@ Future<Uint8List?> _videoToThumbnailIsolate({
         }
       }
     } on PlatformException catch (e) {
+      // Handle any platform-specific exceptions
       e.message.toString().print("_videoToThumbnail Error");
     }
-    // Return null because paltform is not supported or image failed to compress
+
+    // Return null because the platform is not supported or image failed to compress
     return null;
   }).catchError((_) => null);
 }

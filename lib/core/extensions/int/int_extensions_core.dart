@@ -23,15 +23,24 @@ extension IntExtendedExtensions on int? {
 
   /// `isSame()` function
   ///
-  /// will check if provided and attached values
+  /// This extension method checks if the provided value [v] is the same as the
+  /// value this method is called on. Returns `true` if they are the same,
+  /// otherwise returns `false`.
   ///
-  /// are same then return `true` otherwise `false`
+  /// Usage:
+  ///
+  /// ```dart
+  /// int a = 5;
+  /// int b = 5;
+  /// bool result = a.isSame(b); // Returns true
+  /// ```
   bool isSame(int? v) {
-    // Check if given and provided values are null
-    // then return false
+    // Check if either of the values is null
+    // If any of them is null, they are not the same
     if (this == null || v == null) {
       return false;
     } else {
+      // Values are not null, compare them
       return (this == v);
     }
   }
