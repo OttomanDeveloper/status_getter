@@ -17,8 +17,10 @@ class StatusViewerLayoutWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      itemCount: files.length,
+    return GridView.count(
+      crossAxisCount: 2,
+      mainAxisSpacing: 8,
+      crossAxisSpacing: 8,
       scrollDirection: Axis.vertical,
       padding: const EdgeInsets.all(8.0),
       clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -26,14 +28,9 @@ class StatusViewerLayoutWidget extends StatelessWidget {
       physics: const BouncingScrollPhysics(
         parent: AlwaysScrollableScrollPhysics(),
       ),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-      ),
-      itemBuilder: (BuildContext context, int index) {
+      children: List<Widget>.generate(files.length, (int index) {
         return WhatsAppItemCard(itemPath: files[index]);
-      },
+      }),
     );
   }
 }
