@@ -86,3 +86,16 @@ Feel free to contribute, report issues, or enhance the functionality of Status G
 Let's simplify status saving and video downloading with Status Getter!
 
 🚀📱 #Flutter #WhatsAppStatusSaver #VideoDownloader #MobileApps #OpenSource
+
+## Keywords for Search Ranking
+
+- WhatsApp Status Saver Flutter App.
+- WhatsApp Status Saver Flutter Application.
+- Buisness WhatsApp Status Saver Flutter App.
+- WA Status Saver Flutter App.
+- WhatsApp=Status-Saver
+- WhatsApp Status Downloader
+- All Video Downloader in Flutter/Dart
+- Tiktok Video Downloader in Flutter/Dart
+- Youtube Video Downloader in Flutter/Dart
+- Facebook Video Downloader in Flutter/Dart
