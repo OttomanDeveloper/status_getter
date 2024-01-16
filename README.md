@@ -93,7 +93,7 @@ Let's simplify status saving and video downloading with Status Getter!
 - WhatsApp Status Saver Flutter Application.
 - Buisness WhatsApp Status Saver Flutter App.
 - WA Status Saver Flutter App.
-- WhatsApp=Status-Saver
+- WhatsApp-Status-Saver
 - WhatsApp Status Downloader
 - All Video Downloader in Flutter/Dart
 - Tiktok Video Downloader in Flutter/Dart
