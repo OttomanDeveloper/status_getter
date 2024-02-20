@@ -45,7 +45,7 @@ class MainActivity : FlutterActivity() {
         try {
             println("getVideoThumbnail File Received: $videoPath")
             // Set the data source to the video path
-            retriever.setDataSource(videoPath, HashMap())
+            retriever.setDataSource(this, Uri.parse(videoPath))
             println("getVideoThumbnail File Source is Set")
             // Get the duration of the video in microseconds
             val durationUs: Long =
@@ -56,11 +56,11 @@ class MainActivity : FlutterActivity() {
             val timeUs: Long = durationUs / 2
             println("getVideoThumbnail Got Thumbnail Duration: $timeUs")
             // Get the frame at the calculated timestamp
-            val bitmap: Bitmap? = retriever.getFrameAtTime(timeUs)
+            val bitmap: Bitmap? = retriever.getFrameAtTime(timeUs * 1000)
             println("getVideoThumbnail Got Bitmap")
             val stream: ByteArrayOutputStream = ByteArrayOutputStream();
             println("getVideoThumbnail File Compress Starting")
-            bitmap?.compress(Bitmap.CompressFormat.JPEG, quality ?: 25, stream)
+            bitmap?.compress(Bitmap.CompressFormat.JPEG, quality ?: 30, stream)
             println("getVideoThumbnail File Compress Completed")
             return stream.toByteArray()
         } catch (e: Exception) {
