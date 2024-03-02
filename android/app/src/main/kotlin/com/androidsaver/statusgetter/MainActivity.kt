@@ -3,6 +3,7 @@ package com.androidsaver.statusgetter
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.media.ThumbnailUtils
+import android.net.Uri
 import android.provider.MediaStore
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
