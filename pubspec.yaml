@@ -36,7 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   flutter_bloc: ^8.1.4
   path_provider: ^2.1.2
-  video_player: ^2.8.2
+  video_player: ^2.8.3
   chewie: ^1.7.5
   permission_handler: ^11.3.0
   google_mobile_ads: ^4.0.0
@@ -45,7 +45,7 @@ dependencies:
   go_router: ^13.2.0
   url_launcher: ^6.2.5
   auto_size_text: ^3.0.0
-  google_fonts: ^6.2.0
+  google_fonts: ^6.2.1
   hydrated_bloc: ^9.1.4
   flutter_switch: ^0.3.2
   font_awesome_flutter: ^10.7.0
@@ -56,8 +56,8 @@ dependencies:
   puppeteer: ^3.8.0
   html: ^0.15.4
   flutter_file_downloader: ^1.2.1
-  firebase_core: ^2.25.5
-  cloud_firestore: ^4.15.6
+  firebase_core: ^2.26.0
+  cloud_firestore: ^4.15.7
   http: ^1.2.0
 
 dev_dependencies:

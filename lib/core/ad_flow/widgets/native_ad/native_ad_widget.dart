@@ -182,15 +182,15 @@ class _AdmobNativeAd extends StatelessWidget {
               constraints = BoxConstraints(
                 minHeight: 320,
                 maxHeight: 350,
-                minWidth: context.sizeApi.width,
-                maxWidth: context.sizeApi.width,
+                minWidth: context.width,
+                maxWidth: context.width,
               );
             } else {
               constraints = BoxConstraints(
                 minHeight: 90,
                 maxHeight: 115,
-                minWidth: context.sizeApi.width,
-                maxWidth: context.sizeApi.width,
+                minWidth: context.width,
+                maxWidth: context.width,
               );
             }
             // return the adSize

@@ -26,8 +26,8 @@ class _BusinessWhatsAppLayoutViewState extends State<BusinessWhatsAppLayoutView>
   Widget build(BuildContext context) {
     super.build(context);
     return SizedBox(
-      width: context.sizeApi.width,
-      height: context.sizeApi.height,
+      width: context.width,
+      height: context.height,
       child: BlocBuilder<BusinessWhatsAppBloc, BusinessWhatsAppState>(
         bloc: _businessWhatsAppBloc,
         builder: (BuildContext context, BusinessWhatsAppState state) {

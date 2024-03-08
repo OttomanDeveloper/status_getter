@@ -23,18 +23,34 @@ class BusinessWhatsAppBloc
     });
   }
 
+  /// Emit new state if the bloc is not closed.
+  void emitState({
+    required BusinessWhatsAppState state,
+    required Emitter<BusinessWhatsAppState> emit,
+  }) {
+    if (!isClosed) {
+      return emit(state);
+    }
+  }
+
   /// Create an Instance of `WaUtils`
   final WaUtils waUtils = WaUtils()..getDeviceInfo();
 
   /// Fetch Status from Device Storage
   Future<void> fetchStatus(Emitter<BusinessWhatsAppState> emit) async {
     // Emit Loading State.
-    emit(BusinessWhatsAppLoading());
+    emitState(
+      emit: emit,
+      state: BusinessWhatsAppLoading(),
+    );
     // Check permission status. If permission granted then continue the process.
     if ((await waUtils.askStoragePermission).isDenied) {
       "Storage denied".print("Permission");
       // Emit Permission Denied State.
-      return emit(BusinessWhatsAppPermissionDenied());
+      return emitState(
+        emit: emit,
+        state: BusinessWhatsAppPermissionDenied(),
+      );
     }
     // Now try to get BusinessWhatsApp status from user Device.
     final Directory directory = Directory(await waUtils.whatsAppBusinessPath);
@@ -48,13 +64,22 @@ class BusinessWhatsAppBloc
       // Check if status available then emit status available state
       // otherwise status not available state.
       if (results.isNotEmpty) {
-        return emit(BusinessWhatsAppStatusAvailable(status: results.toList()));
+        return emitState(
+          emit: emit,
+          state: BusinessWhatsAppStatusAvailable(status: results.toList()),
+        );
       } else {
-        return emit(BusinessWhatsAppStatusNotAvailable());
+        return emitState(
+          emit: emit,
+          state: BusinessWhatsAppStatusNotAvailable(),
+        );
       }
     } else {
       // BusinessWhatsApp is not installed on user device.
-      return emit(BusinessWhatsAppNotInstalled());
+      return emitState(
+        emit: emit,
+        state: BusinessWhatsAppNotInstalled(),
+      );
     }
   }
 }

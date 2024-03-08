@@ -17,6 +17,13 @@ class AdManagerCubit extends Cubit<AdManagerState> {
     return getItInstance.get<AdServerCubit>().state;
   }
 
+  /// Emit new state if the bloc is not closed.
+  void emitState(AdManagerState state) {
+    if (!isClosed) {
+      return emit(state);
+    }
+  }
+
   /// Initialize `Ads` SDK
   Future<void> initializeSDK() async {
     // Check if SDK is Already Initialize then Reject the request
@@ -47,7 +54,7 @@ class AdManagerCubit extends Cubit<AdManagerState> {
     // Initialize Admob and AdManager SDK
     MobileAds.instance.initialize();
     // Emit Google Ads State
-    return emit(AdManagerGoogle(
+    return emitState(AdManagerGoogle(
       banner: i.googlebanner.nullSafe,
       native: i.googlenative.nullSafe,
       interstitial: i.googleinterstitial.nullSafe,

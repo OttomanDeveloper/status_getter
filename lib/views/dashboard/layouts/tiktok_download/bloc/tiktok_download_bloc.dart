@@ -27,6 +27,16 @@ class TiktokDownloadBloc
     });
   }
 
+  /// Emit new state if the bloc is not closed.
+  void emitState({
+    required TiktokDownloadState state,
+    required Emitter<TiktokDownloadState> emit,
+  }) {
+    if (!isClosed) {
+      return emit(state);
+    }
+  }
+
   /// Validate and Start Downloading the file.
   Future<void> _validateAndDownload(
       TiktokDownloadEventDownloadFile event) async {
@@ -63,17 +73,26 @@ class TiktokDownloadBloc
     required Emitter<TiktokDownloadState> emit,
   }) {
     /// Emit Loading state until we got something back to return
-    emit(TiktokDownloadLoading());
+    emitState(
+      emit: emit,
+      state: TiktokDownloadLoading(),
+    );
     // Send url to fetch details
     return _socialDownloadRepo
         .check(url: url.trim())
         .then<void>((SiteModel? result) {
       // Check if the result is null then emit no data found state
       if (result == null) {
-        return emit(TiktokDownloadNoResult());
+        return emitState(
+          emit: emit,
+          state: TiktokDownloadNoResult(),
+        );
       }
       // pass request response
-      return emit(TiktokDownloadLoaded(result: result));
+      return emitState(
+        emit: emit,
+        state: TiktokDownloadLoaded(result: result),
+      );
     });
   }
 

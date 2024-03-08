@@ -21,18 +21,28 @@ class WhatsappBloc extends Bloc<WhatsappEvent, WhatsappState> {
     });
   }
 
+  /// Emit new state if the bloc is not closed.
+  void emitState({
+    required WhatsappState state,
+    required Emitter<WhatsappState> emit,
+  }) {
+    if (!isClosed) {
+      return emit(state);
+    }
+  }
+
   /// Create an Instance of `WaUtils`
   final WaUtils waUtils = WaUtils()..getDeviceInfo();
 
   /// Fetch Status from Device Storage
   Future<void> fetchStatus(Emitter<WhatsappState> emit) async {
     // Emit Loading State.
-    emit(WhatsappLoading());
+    emitState(emit: emit, state: WhatsappLoading());
     // Check permission status. If permission granted then continue the process.
     if ((await waUtils.askStoragePermission).isDenied) {
       "Storage denied".print("Permission");
       // Emit Permission Denied State.
-      return emit(WhatsAppPermissionDenied());
+      return emitState(emit: emit, state: WhatsAppPermissionDenied());
     }
     // Now try to get WhatsApp status from user Device.
     final Directory directory = Directory(await waUtils.whatsAppPath);
@@ -46,13 +56,22 @@ class WhatsappBloc extends Bloc<WhatsappEvent, WhatsappState> {
       // Check if status available then emit status available state
       // otherwise status not available state.
       if (results.isNotEmpty) {
-        return emit(WhatsAppStatusAvailable(status: results.toList()));
+        return emitState(
+          emit: emit,
+          state: WhatsAppStatusAvailable(status: results.toList()),
+        );
       } else {
-        return emit(WhatsAppStatusNotAvailable());
+        return emitState(
+          emit: emit,
+          state: WhatsAppStatusNotAvailable(),
+        );
       }
     } else {
       // WhatsApp is not installed on user device.
-      return emit(WhatsAppNotInstalled());
+      return emitState(
+        emit: emit,
+        state: WhatsAppNotInstalled(),
+      );
     }
   }
 }

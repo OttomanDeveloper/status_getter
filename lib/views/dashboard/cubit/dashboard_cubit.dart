@@ -5,6 +5,13 @@ import 'package:statusgetter/meta/constants/storage_constants_meta.dart';
 class DashboardCubit extends HydratedCubit<int> {
   DashboardCubit() : super(_initialIndex);
 
+  /// Emit new state if the bloc is not closed.
+  void emitState(int state) {
+    if (!isClosed) {
+      return emit(state);
+    }
+  }
+
   /// Hold Default `Initial Index` Value
   static const int _initialIndex = 0;
 
@@ -30,7 +37,7 @@ class DashboardCubit extends HydratedCubit<int> {
     // Verify the user is navigating to a new page, not the current one
     if (event != state) {
       // Make sure the stream is active
-      emit(event);
+      emitState(event);
       // Now check if it has to move the page, then move it
       if (movePage) {
         pageController.jumpToPage(event);
@@ -42,13 +49,16 @@ class DashboardCubit extends HydratedCubit<int> {
   /// Hold `GlobalKey` of `ScaffoldState` for `Drawer` to Handle Drawer `Opening` and `Closing`.
   final GlobalKey<ScaffoldState> drawerKey = GlobalKey<ScaffoldState>();
 
+  /// Hold `HydratedCubit` Data Key.
+  final String _dataKey = StorageConstants.dashNavIndex;
+
   @override
   int? fromJson(Map<String, dynamic> json) {
-    return (json[StorageConstants.dashNavIndex] as int?) ?? _initialIndex;
+    return (json[_dataKey] as int?) ?? _initialIndex;
   }
 
   @override
   Map<String, dynamic>? toJson(int state) {
-    return {StorageConstants.dashNavIndex: state};
+    return {_dataKey: state};
   }
 }

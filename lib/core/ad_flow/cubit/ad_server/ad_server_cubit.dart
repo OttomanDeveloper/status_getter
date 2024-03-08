@@ -10,6 +10,13 @@ import 'package:statusgetter/meta/constants/storage_constants_meta.dart';
 class AdServerCubit extends HydratedCubit<AdsModel?> {
   AdServerCubit() : super(null);
 
+  /// Emit new state if the bloc is not closed.
+  void emitState(AdsModel? state) {
+    if (!isClosed) {
+      return emit(state);
+    }
+  }
+
   /// Create an Instance of `SettingsRepository`
   final SettingsRepository _repo = SettingsRepository.instance;
 
@@ -27,16 +34,19 @@ class AdServerCubit extends HydratedCubit<AdsModel?> {
       // Print Ads details into Console.
       result?.toString().print("Firestore Ads Settings");
       // Emit New Data
-      emit(result);
+      emitState(result);
       // Send request to Initialize SDK
       return adManager.initializeSDK();
     });
   }
 
+  /// Hold `HydratedCubit` Data Key.
+  final String _dataKey = StorageConstants.ads;
+
   @override
   AdsModel? fromJson(Map<String, dynamic> json) {
     // Get stored data from map
-    final String? data = (json[StorageConstants.ads] as String?);
+    final String? data = (json[_dataKey] as String?);
     // Check if data is null then don't do anything
     if (data.isEmpty) {
       return null;
@@ -47,6 +57,6 @@ class AdServerCubit extends HydratedCubit<AdsModel?> {
 
   @override
   Map<String, dynamic>? toJson(AdsModel? state) {
-    return {StorageConstants.ads: state?.toDatabase()};
+    return {_dataKey: state?.toDatabase()};
   }
 }
