@@ -56,8 +56,8 @@ dependencies:
   puppeteer: ^3.8.0
   html: ^0.15.4
   flutter_file_downloader: ^1.2.1
-  firebase_core: ^2.26.0
-  cloud_firestore: ^4.15.7
+  firebase_core: ^2.27.0
+  cloud_firestore: ^4.15.8
   http: ^1.2.0
 
 dev_dependencies:
