@@ -83,16 +83,14 @@ mixin SocialDomainMixin {
 
     // Using HeadlessInAppWebView for making headless requests
     HeadlessInAppWebView(
-      // Setting initial options for the web view
-      initialOptions: InAppWebViewGroupOptions(
-        crossPlatform: InAppWebViewOptions(
-          useOnLoadResource: true,
-          mediaPlaybackRequiresUserGesture: false,
-          javaScriptCanOpenWindowsAutomatically: true,
-        ),
+      // Setting for the web view
+      initialSettings: InAppWebViewSettings(
+        useOnLoadResource: true,
+        mediaPlaybackRequiresUserGesture: false,
+        javaScriptCanOpenWindowsAutomatically: true,
       ),
       // Providing the initial URL request
-      initialUrlRequest: URLRequest(url: Uri.parse('https://en.savefrom.net')),
+      initialUrlRequest: URLRequest(url: WebUri('https://en.savefrom.net')),
       // Callback triggered when the web view finishes loading
       onLoadStop: (InAppWebViewController controller, Uri? uri) async {
         // Injecting JavaScript code to populate the form with the provided URL and trigger a click
