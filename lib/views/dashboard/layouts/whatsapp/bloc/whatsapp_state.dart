@@ -1,20 +1,16 @@
 part of 'whatsapp_bloc.dart';
 
 @immutable
-sealed class WhatsappState {}
+final class WhatsappState {
+  final bool? isLoading;
+  final bool? appNotInstalled;
+  final bool? permissionDenied;
+  final List<StatusItemModel>? status;
 
-final class WhatsappLoading extends WhatsappState {}
-
-final class WhatsAppNotInstalled extends WhatsappState {}
-
-final class WhatsAppStatusNotAvailable extends WhatsappState {}
-
-final class WhatsAppStatusAvailable extends WhatsappState {
-  final List<FileSystemEntity> status;
-
-  WhatsAppStatusAvailable({
-    required this.status,
+  const WhatsappState({
+    this.status,
+    this.isLoading,
+    this.appNotInstalled,
+    this.permissionDenied,
   });
 }
-
-final class WhatsAppPermissionDenied extends WhatsappState {}

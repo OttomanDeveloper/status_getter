@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:statusgetter/core/model/status_item/status_item_model.dart';
 import 'package:statusgetter/views/dashboard/layouts/widgets/item_card/item_card_widget.dart';
 
 class StatusViewerLayoutWidget extends StatelessWidget {
@@ -8,7 +8,7 @@ class StatusViewerLayoutWidget extends StatelessWidget {
   /// It allows the widget to persist its state in [PageStorage] across page reloads,
   /// enabling the restoration of scroll position and other stateful information.
   final String pageStorageKey;
-  final List<FileSystemEntity> files;
+  final List<StatusItemModel> files;
   const StatusViewerLayoutWidget({
     super.key,
     required this.files,
@@ -29,7 +29,7 @@ class StatusViewerLayoutWidget extends StatelessWidget {
         parent: AlwaysScrollableScrollPhysics(),
       ),
       children: List<Widget>.generate(files.length, (int index) {
-        return WhatsAppItemCard(itemPath: files[index]);
+        return WhatsAppItemCard(item: files[index]);
       }),
     );
   }

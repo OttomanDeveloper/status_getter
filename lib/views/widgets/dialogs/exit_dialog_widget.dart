@@ -65,16 +65,16 @@ class _ExitDialog extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () => SystemNavigator.pop(),
                   style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(
+                    backgroundColor: WidgetStatePropertyAll(
                       context.theme.colorScheme.primary,
                     ),
-                    surfaceTintColor: MaterialStatePropertyAll(
+                    surfaceTintColor: WidgetStatePropertyAll(
                       context.theme.colorScheme.primary,
                     ),
-                    foregroundColor: const MaterialStatePropertyAll(
+                    foregroundColor: const WidgetStatePropertyAll(
                       AppColors.kWhite,
                     ),
-                    iconColor: const MaterialStatePropertyAll(
+                    iconColor: const WidgetStatePropertyAll(
                       AppColors.kWhite,
                     ),
                   ),

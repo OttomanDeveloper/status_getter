@@ -160,17 +160,17 @@ class _TiktokDownloadLayoutViewState extends State<TiktokDownloadLayoutView>
                     label: const Text("Save Video"),
                     icon: const Icon(Icons.download_outlined),
                     style: ButtonStyle(
-                      minimumSize: MaterialStatePropertyAll(buttonSize),
-                      backgroundColor: MaterialStatePropertyAll(
+                      minimumSize: WidgetStatePropertyAll(buttonSize),
+                      backgroundColor: WidgetStatePropertyAll(
                         context.theme.colorScheme.primary,
                       ),
-                      surfaceTintColor: MaterialStatePropertyAll(
+                      surfaceTintColor: WidgetStatePropertyAll(
                         context.theme.colorScheme.primary,
                       ),
-                      foregroundColor: const MaterialStatePropertyAll(
+                      foregroundColor: const WidgetStatePropertyAll(
                         AppColors.kWhite,
                       ),
-                      iconColor: const MaterialStatePropertyAll(
+                      iconColor: const WidgetStatePropertyAll(
                         AppColors.kWhite,
                       ),
                     ),

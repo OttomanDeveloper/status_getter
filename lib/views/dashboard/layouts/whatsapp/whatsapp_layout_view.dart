@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statusgetter/core/extensions/buildcontext/buildcontext_extensions_core.dart';
+import 'package:statusgetter/core/extensions/list/list_extension_core.dart';
 import 'package:statusgetter/core/functions/get_it/get_it_functions_core.dart';
 import 'package:statusgetter/views/dashboard/layouts/whatsapp/bloc/whatsapp_bloc.dart';
 import 'package:statusgetter/views/dashboard/layouts/widgets/not_installed_text/not_installed_text_widget.dart';
@@ -18,7 +19,7 @@ class _WhatsAppLayoutViewState extends State<WhatsAppLayoutView>
     with AutomaticKeepAliveClientMixin {
   /// Create an Instance of `WhatsappBloc`
   final WhatsappBloc _whatsappBloc = getItInstance.get<WhatsappBloc>()
-    ..add(WhatsappEventFetch());
+    ..fetchStatus();
 
   @override
   Widget build(BuildContext context) {
@@ -29,29 +30,29 @@ class _WhatsAppLayoutViewState extends State<WhatsAppLayoutView>
       child: BlocBuilder<WhatsappBloc, WhatsappState>(
         bloc: _whatsappBloc,
         builder: (BuildContext context, WhatsappState state) {
-          if (state is WhatsAppNotInstalled) {
+          if (state.appNotInstalled ?? false) {
             return const NotInstalledTextWidget(
               text: "Oops! WhatsApp is not installed on this device.",
             );
-          } else if (state is WhatsappLoading) {
+          } else if (state.isLoading ?? false) {
             return const Center(
               child: CircularProgressIndicator.adaptive(),
             );
-          } else if (state is WhatsAppStatusNotAvailable) {
+          } else if (state.status.nullSafe.isEmpty) {
             return const NotInstalledTextWidget(
               text:
                   "At the moment, there is no image or video status available.",
             );
-          } else if (state is WhatsAppPermissionDenied) {
+          } else if (state.permissionDenied ?? false) {
             return PermissionDeniedWidget(
               onTap: () {
-                _whatsappBloc.add(WhatsappEventAskPermission());
+                _whatsappBloc.askStoragePermission();
                 return;
               },
             );
-          } else if (state is WhatsAppStatusAvailable) {
+          } else if (state.status.nullSafe.isNotEmpty) {
             return StatusViewerLayoutWidget(
-              files: state.status,
+              files: state.status.nullSafe,
               pageStorageKey: toStringShort(),
             );
           } else {

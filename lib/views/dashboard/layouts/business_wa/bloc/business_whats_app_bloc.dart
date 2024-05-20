@@ -3,83 +3,60 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:statusgetter/core/extensions/file_system_entity/file_system_entity_extension_core.dart';
 import 'package:statusgetter/core/extensions/object/object_extension_core.dart';
 import 'package:statusgetter/core/functions/utils/utils_fun_core.dart';
+import 'package:statusgetter/core/model/status_item/status_item_model.dart';
 
-part 'business_whats_app_event.dart';
 part 'business_whats_app_state.dart';
 
-class BusinessWhatsAppBloc
-    extends Bloc<BusinessWhatsAppEvent, BusinessWhatsAppState> {
-  BusinessWhatsAppBloc() : super(BusinessWhatsAppLoading()) {
-    on<BusinessWhatsAppEventFetch>((event, emit) async {
-      return fetchStatus(emit);
-    });
-    on<BusinessWhatsAppEventAskPermission>((event, emit) async {
-      /// Ask for user device storage permission
-      return waUtils.askStoragePermission.then<void>((PermissionStatus status) {
-        return fetchStatus(emit);
-      });
-    });
-  }
+class BusinessWhatsAppBloc extends Cubit<BusinessWhatsAppState> {
+  BusinessWhatsAppBloc() : super(const BusinessWhatsAppState(isLoading: true));
 
   /// Emit new state if the bloc is not closed.
-  void emitState({
-    required BusinessWhatsAppState state,
-    required Emitter<BusinessWhatsAppState> emit,
-  }) {
+  void emitState(BusinessWhatsAppState state) {
     if (!isClosed) {
       return emit(state);
     }
   }
 
+  /// Requests permission from the user to access device storage and then fetches the status.
+  Future<void> askStoragePermission() {
+    // Asks the user for storage permission using a utility function.
+    return waUtils.askStoragePermission.then<void>((_) {
+      // After permission is granted, fetches the storage status.
+      return fetchStatus();
+    });
+  }
+
   /// Create an Instance of `WaUtils`
   final WaUtils waUtils = WaUtils()..getDeviceInfo();
 
-  /// Fetch Status from Device Storage
-  Future<void> fetchStatus(Emitter<BusinessWhatsAppState> emit) async {
-    // Emit Loading State.
-    emitState(
-      emit: emit,
-      state: BusinessWhatsAppLoading(),
-    );
-    // Check permission status. If permission granted then continue the process.
+  /// Fetches BusinessWhatsApp status from the device storage.
+  Future<void> fetchStatus() async {
+    /// Emit Loading State to indicate that the process has started.
+    emitState(const BusinessWhatsAppState(isLoading: true));
+
+    /// Check permission status for accessing device storage.
+    /// If permission is denied, print a message and emit Permission Denied State.
     if ((await waUtils.askStoragePermission).isDenied) {
       "Storage denied".print("Permission");
-      // Emit Permission Denied State.
-      return emitState(
-        emit: emit,
-        state: BusinessWhatsAppPermissionDenied(),
-      );
+      return emitState(const BusinessWhatsAppState(permissionDenied: true));
     }
-    // Now try to get BusinessWhatsApp status from user Device.
+
+    /// Try to get the path for BusinessWhatsApp from the user's device.
     final Directory directory = Directory(await waUtils.whatsAppBusinessPath);
-    // Check if the given directory exists or not
+
+    /// Check if the BusinessWhatsApp directory exists.
     if (await directory.exists()) {
-      // BusinessWhatsApp is installed so now get status from device.
-      final Iterable<FileSystemEntity> results =
-          directory.listSync().where((FileSystemEntity e) {
-        return (e.path.endsWith(".mp4") || e.path.endsWith(".jpg"));
-      });
-      // Check if status available then emit status available state
-      // otherwise status not available state.
-      if (results.isNotEmpty) {
-        return emitState(
-          emit: emit,
-          state: BusinessWhatsAppStatusAvailable(status: results.toList()),
-        );
-      } else {
-        return emitState(
-          emit: emit,
-          state: BusinessWhatsAppStatusNotAvailable(),
-        );
-      }
+      /// If the directory exists, list its contents and emit Status Available State.
+      /// Otherwise, emit Status Not Available State.
+      return emitState(BusinessWhatsAppState(
+        status: await directory.listSync().waStatusList,
+      ));
     } else {
-      // BusinessWhatsApp is not installed on user device.
-      return emitState(
-        emit: emit,
-        state: BusinessWhatsAppNotInstalled(),
-      );
+      /// If the directory does not exist, it means BusinessWhatsApp is not installed.
+      return emitState(const BusinessWhatsAppState(appNotInstalled: true));
     }
   }
 }

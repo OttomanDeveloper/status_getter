@@ -5,6 +5,7 @@ import 'package:statusgetter/meta/themes/theme_meta.dart';
 
 /// Custom Scaffold with Some Extra Features
 class CustomScaffold extends StatefulWidget {
+  final bool canPop;
   final StackFit fit;
   final Clip clipBehavior;
   final List<Widget> children;
@@ -15,6 +16,7 @@ class CustomScaffold extends StatefulWidget {
   final bool? resizeToAvoidBottomInset;
   final SystemUiOverlayStyle? uiOverlay;
   final bool isScrollable, hideScrollGlow;
+  final void Function(bool)? onPopInvoked;
   final AlignmentDirectional stackAligment;
   final Future<bool> Function()? onWillPop;
   final ScrollController? scrollController;
@@ -39,6 +41,8 @@ class CustomScaffold extends StatefulWidget {
     this.onWillPop,
     this.globalKey,
     this.endDrawer,
+    this.onPopInvoked,
+    this.canPop = true,
     this.onDrawerChanged,
     this.backgroundColor,
     this.isStack = false,
@@ -95,8 +99,9 @@ class _CustomScaffoldState extends State<CustomScaffold> {
     final Size size = context.sizeApi;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: widget.uiOverlay ?? AppThemes().normalGB(context),
-      child: WillPopScope(
-        onWillPop: widget.onWillPop ?? () async => true,
+      child: PopScope(
+        canPop: widget.canPop,
+        onPopInvoked: widget.onPopInvoked,
         child: Scaffold(
           appBar: widget.appBar,
           drawer: widget.drawer,

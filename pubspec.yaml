@@ -19,7 +19,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.1+2
 
 environment:
-  sdk: ">=3.3.0 <4.0.0"
+  sdk: ">=3.4.0 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -39,10 +39,10 @@ dependencies:
   video_player: ^2.8.6
   chewie: ^1.8.1
   permission_handler: ^11.3.1
-  google_mobile_ads: ^5.0.0
+  google_mobile_ads: ^5.1.0
   image_gallery_saver: ^2.0.3
   get_it: ^7.7.0
-  go_router: ^14.0.2
+  go_router: ^14.1.2
   url_launcher: ^6.2.6
   auto_size_text: ^3.0.0
   google_fonts: ^6.2.1
@@ -53,11 +53,11 @@ dependencies:
   device_info_plus: ^9.1.2
   share_plus: ^7.2.2
   flutter_inappwebview: ^6.0.0
-  puppeteer: ^3.9.0
+  puppeteer: ^3.11.0
   html: ^0.15.4
   flutter_file_downloader: ^1.2.1
-  firebase_core: ^2.30.1
-  cloud_firestore: ^4.17.2
+  firebase_core: ^2.31.0
+  cloud_firestore: ^4.17.3
   http: ^1.2.0
 
 dev_dependencies:
@@ -69,7 +69,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.2
+  flutter_lints: ^4.0.0
   flutter_launcher_icons: ^0.13.1
 
 # Set Flutter App Launcher Icon

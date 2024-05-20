@@ -1,36 +1,34 @@
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:statusgetter/core/extensions/buildcontext/buildcontext_extensions_core.dart';
-import 'package:statusgetter/core/functions/utils/utils_fun_core.dart';
+import 'package:statusgetter/core/extensions/strings/string_extension_core.dart';
+import 'package:statusgetter/core/model/status_item/status_item_model.dart';
 import 'package:statusgetter/meta/colors/colors_meta.dart';
 import 'package:statusgetter/views/status_saver/image/image_status_saver_view.dart';
 import 'package:statusgetter/views/status_saver/video/video_status_saver_view.dart';
 
 class WhatsAppItemCard extends StatelessWidget {
-  final FileSystemEntity itemPath;
-  const WhatsAppItemCard({super.key, required this.itemPath});
+  final StatusItemModel item;
+  const WhatsAppItemCard({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
-    final bool isImage = itemPath.path.endsWith(".jpg");
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return GestureDetector(
           onTap: () {
-            if (isImage) {
+            if (!item.isVideo) {
               Navigator.push<void>(context, CupertinoPageRoute(
                 builder: (_) {
-                  return ImageStatusSaverView(path: itemPath.path);
+                  return ImageStatusSaverView(path: item.filePath.nullSafe);
                 },
               ));
               return;
             } else {
               Navigator.push<void>(context, CupertinoPageRoute(
                 builder: (_) {
-                  return VideoStatusSaverView(path: itemPath.path);
+                  return VideoStatusSaverView(path: item.filePath.nullSafe);
                 },
               ));
               return;
@@ -47,38 +45,23 @@ class WhatsAppItemCard extends StatelessWidget {
                 width: 0.7,
                 color: context.theme.colorScheme.primary,
               ),
-              image: isImage
+              image: !item.isVideo
                   ? DecorationImage(
                       fit: BoxFit.cover,
-                      image: FileImage(File(itemPath.path)),
+                      image: FileImage(File(item.filePath.nullSafe)),
                     )
                   : null,
             ),
             child: Stack(
               clipBehavior: Clip.antiAliasWithSaveLayer,
               children: <Widget>[
-                if (!isImage)
+                if (item.isVideo)
                   Positioned.fill(
-                    child: FutureBuilder<Uint8List?>(
-                      future: WaUtils().getThumbnail(itemPath.path),
-                      builder: (_, AsyncSnapshot<Uint8List?> s) {
-                        if (s.connectionState != ConnectionState.done) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else if (s.hasData && s.data != null) {
-                          return Image.memory(
-                            fit: BoxFit.cover,
-                            s.data!,
-                            width: constraints.maxWidth,
-                            height: constraints.maxHeight,
-                          );
-                        } else {
-                          return const Center(
-                            child: Icon(Icons.info),
-                          );
-                        }
-                      },
+                    child: Image.memory(
+                      fit: BoxFit.cover,
+                      item.videoThumbnail!,
+                      width: constraints.maxWidth,
+                      height: constraints.maxHeight,
                     ),
                   ),
                 Positioned(
@@ -94,7 +77,7 @@ class WhatsAppItemCard extends StatelessWidget {
                     child: Icon(
                       size: 20.0,
                       color: AppColors.kWhite,
-                      isImage ? Icons.image : Icons.play_circle_fill,
+                      item.isVideo ? Icons.play_circle_fill : Icons.image,
                     ),
                   ),
                 ),

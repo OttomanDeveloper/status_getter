@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statusgetter/core/extensions/buildcontext/buildcontext_extensions_core.dart';
+import 'package:statusgetter/core/extensions/list/list_extension_core.dart';
 import 'package:statusgetter/core/functions/get_it/get_it_functions_core.dart';
 import 'package:statusgetter/views/dashboard/layouts/business_wa/bloc/business_whats_app_bloc.dart';
 import 'package:statusgetter/views/dashboard/layouts/widgets/not_installed_text/not_installed_text_widget.dart';
@@ -18,9 +19,8 @@ class BusinessWhatsAppLayoutView extends StatefulWidget {
 class _BusinessWhatsAppLayoutViewState extends State<BusinessWhatsAppLayoutView>
     with AutomaticKeepAliveClientMixin {
   /// Create an Instance of `BusinessWhatsAppBloc`
-  final BusinessWhatsAppBloc _businessWhatsAppBloc = getItInstance
-      .get<BusinessWhatsAppBloc>()
-    ..add(BusinessWhatsAppEventFetch());
+  final BusinessWhatsAppBloc _businessWhatsAppBloc =
+      getItInstance.get<BusinessWhatsAppBloc>()..fetchStatus();
 
   @override
   Widget build(BuildContext context) {
@@ -31,29 +31,29 @@ class _BusinessWhatsAppLayoutViewState extends State<BusinessWhatsAppLayoutView>
       child: BlocBuilder<BusinessWhatsAppBloc, BusinessWhatsAppState>(
         bloc: _businessWhatsAppBloc,
         builder: (BuildContext context, BusinessWhatsAppState state) {
-          if (state is BusinessWhatsAppNotInstalled) {
+          if (state.appNotInstalled ?? false) {
             return const NotInstalledTextWidget(
               text: "Oops! WhatsApp Business is not installed on this device.",
             );
-          } else if (state is BusinessWhatsAppLoading) {
+          } else if (state.isLoading ?? false) {
             return const Center(
               child: CircularProgressIndicator.adaptive(),
             );
-          } else if (state is BusinessWhatsAppStatusNotAvailable) {
+          } else if (state.status.nullSafe.isEmpty) {
             return const NotInstalledTextWidget(
               text:
                   "At the moment, there is no image or video status available.",
             );
-          } else if (state is BusinessWhatsAppPermissionDenied) {
+          } else if (state.permissionDenied ?? false) {
             return PermissionDeniedWidget(
               onTap: () {
-                _businessWhatsAppBloc.add(BusinessWhatsAppEventAskPermission());
+                _businessWhatsAppBloc.askStoragePermission();
                 return;
               },
             );
-          } else if (state is BusinessWhatsAppStatusAvailable) {
+          } else if (state.status.nullSafe.isNotEmpty) {
             return StatusViewerLayoutWidget(
-              files: state.status,
+              files: state.status.nullSafe,
               pageStorageKey: toStringShort(),
             );
           } else {

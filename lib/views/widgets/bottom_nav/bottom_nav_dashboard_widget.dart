@@ -14,14 +14,14 @@ class DashboardBottomNav extends StatelessWidget {
     return Theme(
       data: context.theme.copyWith(
         navigationBarTheme: context.theme.navigationBarTheme.copyWith(
-          iconTheme: const MaterialStatePropertyAll(
+          iconTheme: const WidgetStatePropertyAll(
             IconThemeData(size: 24.0),
           ),
           elevation: 4.0,
           backgroundColor: context.bgColor,
           surfaceTintColor: context.bgColor,
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-          labelTextStyle: MaterialStatePropertyAll(
+          labelTextStyle: WidgetStatePropertyAll(
             context.textTheme.bodyLarge?.copyWith(fontSize: fontSize),
           ),
         ),
