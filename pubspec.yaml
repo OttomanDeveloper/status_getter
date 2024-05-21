@@ -55,7 +55,7 @@ dependencies:
   flutter_inappwebview: ^6.0.0
   puppeteer: ^3.11.0
   html: ^0.15.4
-  flutter_file_downloader: ^1.2.1
+  flutter_file_downloader: ^2.0.0-dev.1
   firebase_core: ^2.31.0
   cloud_firestore: ^4.17.3
   http: ^1.2.0
