@@ -27,6 +27,11 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
+    # Const rules
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    prefer_const_constructors_in_immutables: true
+    prefer_const_literals_to_create_immutables: true
     close_sinks: true
     hash_and_equals: true
     empty_statements: true

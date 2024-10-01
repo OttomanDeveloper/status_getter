@@ -148,7 +148,7 @@ class AppThemes {
         inverseSurface: Color(0xFFE1E3DE),
         inversePrimary: Color(0xFF006D40),
         shadow: Color(0xFF000000),
-        surfaceTint: Color(0xFF79DA9F),
+        surfaceTint: Color(0xFF79DA9F), 
         outlineVariant: Color(0xFF414942),
         scrim: Color(0xFF000000),
       ),

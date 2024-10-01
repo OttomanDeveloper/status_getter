@@ -4,11 +4,10 @@
     <!-- Android Internet Access Permission -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Android Storage Read-Write Access Permission -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission
-        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-        android:minSdkVersion="30"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
 
     <application
         android:label="Status Getter"
@@ -59,6 +58,9 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        <!-- WhatsApp Packages to Check if the WhatsApp Apps is installed on the device or not. -->
+        <package android:name="com.whatsapp"/>
+        <package android:name="com.whatsapp.w4b"/>
         <!-- If your app opens https URLs -->
         <intent>
             <action android:name="android.intent.action.VIEW" />
