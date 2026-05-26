@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh api *)",
+      "WebFetch(domain:support.google.com)",
+      "PowerShell(gh api *)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:xdaforums.com)",
+      "WebFetch(domain:f-droid.org)",
+      "WebFetch(domain:aatayyab.wordpress.com)",
+      "WebFetch(domain:www.esper.io)",
+      "WebFetch(domain:commonsware.com)",
+      "WebFetch(domain:community.kodular.io)",
+      "WebFetch(domain:atrii.dev)",
+      "WebFetch(domain:www.edureka.co)",
+      "WebFetch(domain:www.programcreek.com)",
+      "WebFetch(domain:techenum.com)",
+      "PowerShell(flutter *)",
+      "PowerShell(Get-Content *)",
+      "PowerShell(Get-ChildItem *)",
+      "Bash(Get-ChildItem -Path \"D:\\\\statusgetter\\\\lib\" -Recurse -Directory)"
+    ]
+  }
+}

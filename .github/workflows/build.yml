@@ -1,9 +1,7 @@
-name: Build APK
+name: Build & Release APK
 
 on:
   push:
-    branches: [main]
-  pull_request:
     branches: [main]
 
 jobs:
@@ -27,7 +25,19 @@ jobs:
 
       - run: flutter build apk --release --no-tree-shake-icons
 
-      - uses: actions/upload-artifact@v4
+      - name: Get version from pubspec
+        id: version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | sed 's/+.*//')
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create or update GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          tag_name: ${{ steps.version.tag }}
+          name: Release ${{ steps.version.tag }}
+          body: "Automated release from commit ${{ github.sha }}"
+          files: build/app/outputs/flutter-apk/app-release.apk
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
