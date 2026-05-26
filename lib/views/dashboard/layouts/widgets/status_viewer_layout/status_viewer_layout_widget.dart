@@ -3,10 +3,6 @@ import 'package:statusgetter/core/model/status_item/status_item_model.dart';
 import 'package:statusgetter/views/dashboard/layouts/widgets/item_card/item_card_widget.dart';
 
 class StatusViewerLayoutWidget extends StatelessWidget {
-  /// A [PageStorageKey] is used to uniquely identify a widget in the widget tree
-  /// and preserve its scroll position when the widget is destroyed and recreated.
-  /// It allows the widget to persist its state in [PageStorage] across page reloads,
-  /// enabling the restoration of scroll position and other stateful information.
   final String pageStorageKey;
   final List<StatusItemModel> files;
   const StatusViewerLayoutWidget({
@@ -15,22 +11,41 @@ class StatusViewerLayoutWidget extends StatelessWidget {
     required this.pageStorageKey,
   });
 
+  static const int _crossAxisCount = 2;
+  static const double _spacing = 10.0;
+  static const double _padding = 10.0;
+  static const double _aspectRatio = 0.75;
+
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      mainAxisSpacing: 8,
-      crossAxisSpacing: 8,
-      scrollDirection: Axis.vertical,
-      padding: const EdgeInsets.all(8.0),
-      clipBehavior: Clip.antiAliasWithSaveLayer,
+    final double screenWidth = MediaQuery.sizeOf(context).width;
+    final double cardWidth =
+        (screenWidth - (_padding * 2) - (_spacing * (_crossAxisCount - 1))) /
+            _crossAxisCount;
+    final double cardHeight = cardWidth / _aspectRatio;
+    final int cacheW = cardWidth.toInt();
+    final int cacheH = cardHeight.toInt();
+
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: _crossAxisCount,
+        mainAxisSpacing: _spacing,
+        crossAxisSpacing: _spacing,
+        childAspectRatio: _aspectRatio,
+      ),
+      itemCount: files.length,
+      padding: const EdgeInsets.all(_padding),
       key: PageStorageKey<String>(pageStorageKey),
       physics: const BouncingScrollPhysics(
         parent: AlwaysScrollableScrollPhysics(),
       ),
-      children: List<Widget>.generate(files.length, (int index) {
-        return WhatsAppItemCard(item: files[index]);
-      }),
+      itemBuilder: (BuildContext context, int index) {
+        return WhatsAppItemCard(
+          item: files[index],
+          cacheWidth: cacheW,
+          cacheHeight: cacheH,
+        );
+      },
     );
   }
 }

@@ -1,101 +1,114 @@
 package com.androidsaver.statusgetter
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.media.ThumbnailUtils
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import java.io.ByteArrayOutputStream
 
+/**
+ * Main activity that hosts two [MethodChannel]s:
+ *
+ * 1. **Thumbnail channel** (`ottomancoder`) — generates video thumbnails from filesystem paths.
+ *    Used by the legacy storage path (SDK < 30).
+ *
+ * 2. **SAF channel** — delegated to [SafHandler] for all Storage Access Framework operations.
+ *    Used on Android 11+ (SDK >= 30) to access WhatsApp status files without
+ *    MANAGE_EXTERNAL_STORAGE.
+ */
 class MainActivity : FlutterActivity() {
 
-    /// Thumbnail Getter `MethodChannel` Name
-    private val channelId: String = "com.androidsaver.statusgetter/ottomancoder";
-
-    ///  Thumbnail Method ID
-    private val methodId: String = "thumbnail";
-
-    /// Initialize Flutter Engine and Set Method Handler
-    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
-        super.configureFlutterEngine(flutterEngine)
-        MethodChannel(
-            flutterEngine.dartExecutor.binaryMessenger, channelId
-        ).setMethodCallHandler { call, result ->
-            if (call.method == methodId) {
-                val videoPath: String? = call.argument<String>("path");
-                val quality: Int? = call.argument("quality");
-                var thumbnail: ByteArray? = getVideoThumbnail(videoPath, quality);
-                // Check if the thumbnail is null then try to get it from second method.
-                if (thumbnail == null) {
-                    thumbnail = generateThumbnail(videoPath, quality);
-                }
-                result.success(thumbnail);
-            } else {
-                result.notImplemented();
-            }
-        }
+    companion object {
+        private const val TAG = "MainActivity"
+        private const val THUMBNAIL_CHANNEL = "com.androidsaver.statusgetter/ottomancoder"
+        private const val THUMBNAIL_METHOD = "thumbnail"
     }
 
-    /// Generate Video Thumbnail Using `MediaMetadataRetriever`
-    private fun getVideoThumbnail(videoPath: String?, quality: Int?): ByteArray? {
-        val retriever: MediaMetadataRetriever = MediaMetadataRetriever()
+    private lateinit var safHandler: SafHandler
 
-        try {
-            println("getVideoThumbnail File Received: $videoPath")
-            // Set the data source to the video path
-            retriever.setDataSource(this, Uri.parse(videoPath))
-            println("getVideoThumbnail File Source is Set")
-            // Get the duration of the video in microseconds
-            val durationUs: Long =
-                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong()
-                    ?: 0
-            println("getVideoThumbnail Got File Duration: $durationUs")
-            // Calculate the timestamp for the midpoint (adjust this based on your requirements)
-            val timeUs: Long = durationUs / 2
-            println("getVideoThumbnail Got Thumbnail Duration: $timeUs")
-            // Get the frame at the calculated timestamp
-            val bitmap: Bitmap? = retriever.getFrameAtTime(timeUs * 1000)
-            println("getVideoThumbnail Got Bitmap")
-            val stream: ByteArrayOutputStream = ByteArrayOutputStream();
-            println("getVideoThumbnail File Compress Starting")
-            bitmap?.compress(Bitmap.CompressFormat.JPEG, quality ?: 30, stream)
-            println("getVideoThumbnail File Compress Completed")
-            return stream.toByteArray()
-        } catch (e: Exception) {
-            println("getVideoThumbnail Error: ${e.message}")
-            e.printStackTrace()
-        } finally {
-            println("getVideoThumbnail Released")
-            retriever.release()
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        super.configureFlutterEngine(flutterEngine)
+
+        val messenger = flutterEngine.dartExecutor.binaryMessenger
+
+        MethodChannel(messenger, THUMBNAIL_CHANNEL).setMethodCallHandler { call, result ->
+            if (call.method == THUMBNAIL_METHOD) {
+                val videoPath = call.argument<String>("path")
+                val quality = call.argument<Int>("quality")
+                val thumbnail = getVideoThumbnail(videoPath, quality)
+                    ?: generateThumbnailFallback(videoPath, quality)
+                result.success(thumbnail)
+            } else {
+                result.notImplemented()
+            }
         }
 
+        safHandler = SafHandler(this, messenger)
+        safHandler.register()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (::safHandler.isInitialized && safHandler.onActivityResult(requestCode, resultCode, data)) {
+            return
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    /**
+     * Extracts a video thumbnail using [MediaMetadataRetriever].
+     * Takes the frame at the video's midpoint and compresses it as JPEG.
+     */
+    private fun getVideoThumbnail(videoPath: String?, quality: Int?): ByteArray? {
+        val retriever = MediaMetadataRetriever()
+        try {
+            retriever.setDataSource(this, Uri.parse(videoPath))
+            val durationMs = retriever.extractMetadata(
+                MediaMetadataRetriever.METADATA_KEY_DURATION
+            )?.toLong() ?: 0
+            val bitmap = retriever.getFrameAtTime((durationMs / 2) * 1000)
+
+            if (bitmap != null) {
+                val stream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, quality ?: 30, stream)
+                bitmap.recycle()
+                return stream.toByteArray()
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "getVideoThumbnail failed: ${e.message}")
+        } finally {
+            retriever.release()
+        }
         return null
     }
 
-    /// Generate Video Thumbnail Using `ThumbnailUtils`
-    private fun generateThumbnail(videoPath: String?, quality: Int?): ByteArray? {
-
+    /**
+     * Fallback thumbnail generation using [ThumbnailUtils] for cases where
+     * [MediaMetadataRetriever] fails (e.g. unsupported codec).
+     */
+    @Suppress("DEPRECATION")
+    private fun generateThumbnailFallback(videoPath: String?, quality: Int?): ByteArray? {
+        if (videoPath == null) return null
         return try {
-            println("generateThumbnail File Received: $videoPath")
-            val bitmap: Bitmap? = ThumbnailUtils.createVideoThumbnail(
-                videoPath!!, MediaStore.Images.Thumbnails.MINI_KIND
+            val bitmap = ThumbnailUtils.createVideoThumbnail(
+                videoPath, MediaStore.Images.Thumbnails.MINI_KIND
             )
-            println("generateThumbnail Got Video Bitmap")
-            val stream: ByteArrayOutputStream = ByteArrayOutputStream()
-            println("generateThumbnail Starting Compress Function")
-            bitmap?.compress(Bitmap.CompressFormat.JPEG, quality ?: 25, stream)
-            println("generateThumbnail Completed Compress Function")
-            stream.toByteArray()
+            if (bitmap != null) {
+                val stream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, quality ?: 25, stream)
+                bitmap.recycle()
+                stream.toByteArray()
+            } else {
+                null
+            }
         } catch (e: Exception) {
-            println("generateThumbnail Error: ${e.message}")
-            e.printStackTrace()
+            Log.w(TAG, "generateThumbnailFallback failed: ${e.message}")
             null
         }
-
     }
-
-
 }

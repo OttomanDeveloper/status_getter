@@ -33,7 +33,7 @@ abstract class AppColors {
 
   /// Calculate the relative luminance of a color
   double calculateRelativeLuminance(Color color) {
-    return (color.red * 0.299 + color.green * 0.587 + color.blue * 0.114) / 255;
+    return (color.r * 0.299 + color.g * 0.587 + color.b * 0.114);
   }
 
   /// Calculate the contrast ratio between two colors

@@ -13,7 +13,7 @@ extension FileSystemEntityExtensionModule on FileSystemEntity {
   bool get isPicture => path.endsWith(".jpg");
 }
 
-/// Extension module on Iterable<FileSystemEntity> to generate a list of StatusItemModel
+/// Extension module on `Iterable<FileSystemEntity>` to generate a list of `StatusItemModel`
 extension FileSystemEntityListExtensionModule on Iterable<FileSystemEntity> {
   /// Asynchronously generates a list of StatusItemModel representing the
   /// status of each FileSystemEntity in the iterable.

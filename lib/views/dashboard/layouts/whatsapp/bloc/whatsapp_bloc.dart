@@ -19,13 +19,20 @@ class WhatsappBloc extends Cubit<WhatsappState> {
     }
   }
 
-  /// Requests permission from the user to access device storage and then fetches the status.
-  Future<void> askStoragePermission() {
-    // Asks the user for storage permission using a utility function.
-    return waUtils.askStoragePermission.then<void>((_) {
-      // After permission is granted, fetches the storage status.
-      return fetchStatus();
-    });
+  /// Requests permission and then fetches statuses.
+  Future<void> askStoragePermission() async {
+    await waUtils.ensureDeviceInfo();
+    if (waUtils.useSaf) {
+      try {
+        final String? treeUri = await waUtils.requestSafPermission(
+          WaUtils.whatsAppSafPath,
+        );
+        if (treeUri != null) return fetchStatus();
+      } catch (_) {}
+      return;
+    }
+    await waUtils.askLegacyStoragePermission;
+    return fetchStatus();
   }
 
   /// Create an Instance of `WaUtils`
@@ -33,29 +40,39 @@ class WhatsappBloc extends Cubit<WhatsappState> {
 
   /// Fetches the status from device storage and updates the application state accordingly.
   Future<void> fetchStatus() async {
-    /// Emit a loading state to indicate that the process has started.
     emitState(const WhatsappState(isLoading: true));
+    await waUtils.ensureDeviceInfo();
 
-    /// Check the storage permission status. If permission is denied, emit a permission denied state and stop further execution.
-    if ((await waUtils.askStoragePermission).isDenied) {
-      "Storage denied".print("Permission");
-
-      /// Emit a permission denied state.
-      return emitState(const WhatsappState(permissionDenied: true));
+    if (waUtils.useSaf) {
+      try {
+        final String? treeUri = await waUtils.checkSafPermission(
+          WaUtils.whatsAppSafPath,
+        );
+        if (treeUri == null) {
+          return emitState(const WhatsappState(permissionDenied: true));
+        }
+        final List<StatusItemModel>? statuses =
+            await waUtils.fetchStatusesViaSaf(treeUri);
+        if (statuses != null && statuses.isNotEmpty) {
+          return emitState(WhatsappState(status: statuses));
+        }
+        return emitState(const WhatsappState(appNotInstalled: true));
+      } catch (_) {
+        return emitState(const WhatsappState(permissionDenied: true));
+      }
     }
 
-    /// Try to get the WhatsApp status directory path from the user's device.
+    // ── SDK < 30: Legacy path ──
+    if ((await waUtils.askLegacyStoragePermission).isDenied) {
+      "Storage denied".print("Permission");
+      return emitState(const WhatsappState(permissionDenied: true));
+    }
     final Directory directory = Directory(await waUtils.whatsAppPath);
-
-    /// Check if the directory exists.
     if (await directory.exists()) {
-      /// If the directory exists, list its contents and emit a status available state with the list of statuses.
       return emitState(WhatsappState(
         status: await directory.listSync().waStatusList,
       ));
-    } else {
-      /// If the directory does not exist, emit an app not installed state, indicating WhatsApp is not installed on the user's device.
-      return emitState(const WhatsappState(appNotInstalled: true));
     }
+    return emitState(const WhatsappState(appNotInstalled: true));
   }
 }

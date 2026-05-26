@@ -50,7 +50,8 @@ class BannerAdState extends State<BannerAdWidget>
     // Check if Google Banner Ad Unit is available or not
     if (adunit.isNotEmpty) {
       /// Get an `AnchoredAdaptiveBannerAdSize` before loading the ad.
-      size ??= await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+      size ??= await AdSize.getLargeAnchoredAdaptiveBannerAdSizeWithOrientation(
+        Orientation.portrait,
         context.width.truncate(),
       );
       if (size == null) {

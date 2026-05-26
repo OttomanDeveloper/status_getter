@@ -9,10 +9,10 @@ Future<void> showExitDialog(BuildContext context) {
   return showGeneralDialog<void>(
     context: context,
     barrierLabel: AppSettings.empty,
-    barrierColor: AppColors.kBlack.withOpacity(0.2),
-    pageBuilder: (_, __, ___) => const SizedBox.shrink(),
+    barrierColor: AppColors.kBlack.withValues(alpha: 0.2),
+    pageBuilder: (_, _, _) => const SizedBox.shrink(),
     transitionDuration: const Duration(milliseconds: 400),
-    transitionBuilder: (_, Animation<double> a1, Animation<double> a2, __) {
+    transitionBuilder: (_, Animation<double> a1, Animation<double> a2, _) {
       return ScaleTransition(
         scale: Tween<double>(begin: 0.5, end: 1.0).animate(a1),
         child: FadeTransition(

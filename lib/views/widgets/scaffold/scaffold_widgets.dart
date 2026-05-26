@@ -16,7 +16,7 @@ class CustomScaffold extends StatefulWidget {
   final bool? resizeToAvoidBottomInset;
   final SystemUiOverlayStyle? uiOverlay;
   final bool isScrollable, hideScrollGlow;
-  final void Function(bool)? onPopInvoked;
+  final void Function(bool, dynamic)? onPopInvokedWithResult;
   final AlignmentDirectional stackAligment;
   final Future<bool> Function()? onWillPop;
   final ScrollController? scrollController;
@@ -41,7 +41,7 @@ class CustomScaffold extends StatefulWidget {
     this.onWillPop,
     this.globalKey,
     this.endDrawer,
-    this.onPopInvoked,
+    this.onPopInvokedWithResult,
     this.canPop = true,
     this.onDrawerChanged,
     this.backgroundColor,
@@ -101,7 +101,7 @@ class _CustomScaffoldState extends State<CustomScaffold> {
       value: widget.uiOverlay ?? AppThemes().normalGB(context),
       child: PopScope(
         canPop: widget.canPop,
-        onPopInvoked: widget.onPopInvoked,
+        onPopInvokedWithResult: widget.onPopInvokedWithResult,
         child: Scaffold(
           appBar: widget.appBar,
           drawer: widget.drawer,

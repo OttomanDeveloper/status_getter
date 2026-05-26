@@ -2,12 +2,11 @@ import 'dart:io';
 
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:statusgetter/core/ad_flow/ad_manager/ad_manager.dart';
 import 'package:statusgetter/core/ad_flow/widgets/banner_ad/banner_ad_widget.dart';
 import 'package:statusgetter/core/extensions/buildcontext/buildcontext_extensions_core.dart';
-import 'package:statusgetter/core/extensions/object/object_extension_core.dart';
 import 'package:statusgetter/core/extensions/strings/string_extension_core.dart';
 import 'package:statusgetter/meta/colors/colors_meta.dart';
 import 'package:statusgetter/meta/themes/theme_meta.dart';
@@ -16,82 +15,162 @@ import 'package:video_player/video_player.dart';
 
 class VideoStatusSaverView extends StatefulWidget {
   final String path;
-  const VideoStatusSaverView({super.key, required this.path});
+  final String heroTag;
+  const VideoStatusSaverView({
+    super.key,
+    required this.path,
+    required this.heroTag,
+  });
 
   @override
   State<VideoStatusSaverView> createState() => _VideoStatusSaverViewState();
 }
 
 class _VideoStatusSaverViewState extends State<VideoStatusSaverView> {
-  /// Create an Instance of `Size`
-  late final Size size = context.sizeApi;
+  late final VideoPlayerController _videoController =
+      VideoPlayerController.file(File(widget.path));
 
-  /// Create a List of Floating Action Buttons
-  final List<Widget> floatingButtons = const <Widget>[
-    Icon(Icons.download),
-    Icon(Icons.share),
-  ];
+  ChewieController? _chewieController;
+  bool _initialized = false;
+  bool _saved = false;
+  bool _hasError = false;
 
-  /// Create an Instance of `ChewieController`
-  late final ChewieController _chewieController = ChewieController(
-    looping: true,
-    autoPlay: true,
-    aspectRatio: (5 / 6),
-    errorBuilder: (_, String error) {
-      return Center(child: Text(error));
-    },
-    videoPlayerController: VideoPlayerController.file(File(widget.path)),
-  );
+  @override
+  void initState() {
+    super.initState();
+    _initPlayer();
+  }
+
+  Future<void> _initPlayer() async {
+    try {
+      await _videoController.initialize();
+      _chewieController = ChewieController(
+        videoPlayerController: _videoController,
+        aspectRatio: _videoController.value.aspectRatio,
+        autoPlay: true,
+        looping: true,
+        showControlsOnInitialize: false,
+      );
+      if (mounted) setState(() => _initialized = true);
+    } catch (_) {
+      if (mounted) setState(() => _hasError = true);
+    }
+  }
 
   @override
   void dispose() {
-    _chewieController.pause();
-    _chewieController.dispose();
+    _chewieController?.pause();
+    _chewieController?.dispose();
+    _videoController.dispose();
     super.dispose();
+  }
+
+  void _save() {
+    ImageGallerySaverPlus.saveFile(widget.path).then<void>((_) {
+      AdManagerFunctions.instance.loadInterstitialAD();
+      if (mounted) {
+        setState(() => _saved = true);
+        "Status Saved".showSnackbar(context);
+      }
+    });
+  }
+
+  void _share() {
+    SharePlus.instance.share(ShareParams(files: [XFile(widget.path)]));
   }
 
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
+      useSafeArea: false,
       isScrollable: false,
-      uiOverlay: AppThemes().normalGB(context).copyWith(
-            statusBarColor: AppColors.noColor,
+      uiOverlay: AppThemes()
+          .normalGB(context)
+          .copyWith(statusBarColor: AppColors.noColor),
+      appBar: AppBar(
+        backgroundColor: AppColors.noColor,
+        surfaceTintColor: AppColors.noColor,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: IconButton(
+          onPressed: () => context.popNavigator(),
+          icon: const Icon(Icons.arrow_back_rounded),
+        ),
+        title: Text(
+          "Video",
+          style: context.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
           ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: List<Widget>.generate(
-          floatingButtons.length,
-          (int index) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 20.0),
-              child: FloatingActionButton(
-                heroTag: "$index",
-                clipBehavior: Clip.antiAliasWithSaveLayer,
-                onPressed: () async {
-                  switch (index) {
-                    case 0:
-                      "download image".print();
-                      ImageGallerySaver.saveFile(widget.path).then<void>((_) {
-                        AdManagerFunctions.instance.loadInterstitialAD();
-                        "Status Saved".showSnackbar(context);
-                      });
-                      break;
-                    case 1:
-                      "Share".print();
-                      Share.shareXFiles([XFile(widget.path)]);
-                      break;
-                  }
-                },
-                child: floatingButtons.elementAt(index),
+        ),
+        centerTitle: true,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            FloatingActionButton.extended(
+              heroTag: "save",
+              onPressed: _saved ? null : _save,
+              backgroundColor: _saved
+                  ? Colors.green
+                  : context.theme.colorScheme.primary,
+              foregroundColor: AppColors.kWhite,
+              icon: Icon(
+                _saved ? Icons.check_rounded : Icons.download_rounded,
               ),
-            );
-          },
+              label: Text(_saved ? "Saved" : "Save"),
+            ),
+            const SizedBox(width: 12.0),
+            FloatingActionButton.extended(
+              heroTag: "share",
+              onPressed: _share,
+              backgroundColor: context.theme.colorScheme.primary,
+              foregroundColor: AppColors.kWhite,
+              icon: const Icon(Icons.share_rounded),
+              label: const Text("Share"),
+            ),
+          ],
         ),
       ),
       children: <Widget>[
-        Expanded(child: Chewie(controller: _chewieController)),
+        Expanded(child: _buildPlayer()),
         const BannerAdWidget(),
       ],
     );
+  }
+
+  Widget _buildPlayer() {
+    if (_hasError) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(
+              Icons.error_outline_rounded,
+              size: 48.0,
+              color: context.textTheme.bodySmall?.color,
+            ),
+            const SizedBox(height: 12.0),
+            Text(
+              "Unable to play this video.",
+              style: context.textTheme.bodyMedium,
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (!_initialized || _chewieController == null) {
+      return Center(
+        child: Hero(
+          tag: widget.heroTag,
+          child: const CircularProgressIndicator.adaptive(),
+        ),
+      );
+    }
+
+    return Chewie(controller: _chewieController!);
   }
 }

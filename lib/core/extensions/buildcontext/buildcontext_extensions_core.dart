@@ -56,7 +56,7 @@ extension BuildContextExtendedExtensions<T> on BuildContext {
   /// `appBar`
   ///
   /// Provide `AppBarTheme` Using `Theme` API
-  AppBarTheme get appBar => theme.appBarTheme;
+  AppBarThemeData get appBar => theme.appBarTheme;
 
   /// `popNavigator`
   ///

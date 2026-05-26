@@ -15,7 +15,7 @@ Future<void> snackbar(
         children: <Widget>[
           Icon(
             icon,
-            color: AppColors.kWhite.withOpacity(0.8),
+            color: AppColors.kWhite.withValues(alpha: 0.8),
           ),
           const SizedBox(width: 10.0),
           Expanded(

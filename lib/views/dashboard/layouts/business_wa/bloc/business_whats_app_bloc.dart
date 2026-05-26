@@ -20,13 +20,20 @@ class BusinessWhatsAppBloc extends Cubit<BusinessWhatsAppState> {
     }
   }
 
-  /// Requests permission from the user to access device storage and then fetches the status.
-  Future<void> askStoragePermission() {
-    // Asks the user for storage permission using a utility function.
-    return waUtils.askStoragePermission.then<void>((_) {
-      // After permission is granted, fetches the storage status.
-      return fetchStatus();
-    });
+  /// Requests permission and then fetches statuses.
+  Future<void> askStoragePermission() async {
+    await waUtils.ensureDeviceInfo();
+    if (waUtils.useSaf) {
+      try {
+        final String? treeUri = await waUtils.requestSafPermission(
+          WaUtils.whatsAppBusinessSafPath,
+        );
+        if (treeUri != null) return fetchStatus();
+      } catch (_) {}
+      return;
+    }
+    await waUtils.askLegacyStoragePermission;
+    return fetchStatus();
   }
 
   /// Create an Instance of `WaUtils`
@@ -34,29 +41,39 @@ class BusinessWhatsAppBloc extends Cubit<BusinessWhatsAppState> {
 
   /// Fetches BusinessWhatsApp status from the device storage.
   Future<void> fetchStatus() async {
-    /// Emit Loading State to indicate that the process has started.
     emitState(const BusinessWhatsAppState(isLoading: true));
+    await waUtils.ensureDeviceInfo();
 
-    /// Check permission status for accessing device storage.
-    /// If permission is denied, print a message and emit Permission Denied State.
-    if ((await waUtils.askStoragePermission).isDenied) {
+    if (waUtils.useSaf) {
+      try {
+        final String? treeUri = await waUtils.checkSafPermission(
+          WaUtils.whatsAppBusinessSafPath,
+        );
+        if (treeUri == null) {
+          return emitState(const BusinessWhatsAppState(permissionDenied: true));
+        }
+        final List<StatusItemModel>? statuses =
+            await waUtils.fetchStatusesViaSaf(treeUri);
+        if (statuses != null && statuses.isNotEmpty) {
+          return emitState(BusinessWhatsAppState(status: statuses));
+        }
+        return emitState(const BusinessWhatsAppState(appNotInstalled: true));
+      } catch (_) {
+        return emitState(const BusinessWhatsAppState(permissionDenied: true));
+      }
+    }
+
+    // ── SDK < 30: Legacy path ──
+    if ((await waUtils.askLegacyStoragePermission).isDenied) {
       "Storage denied".print("Permission");
       return emitState(const BusinessWhatsAppState(permissionDenied: true));
     }
-
-    /// Try to get the path for BusinessWhatsApp from the user's device.
     final Directory directory = Directory(await waUtils.whatsAppBusinessPath);
-
-    /// Check if the BusinessWhatsApp directory exists.
     if (await directory.exists()) {
-      /// If the directory exists, list its contents and emit Status Available State.
-      /// Otherwise, emit Status Not Available State.
       return emitState(BusinessWhatsAppState(
         status: await directory.listSync().waStatusList,
       ));
-    } else {
-      /// If the directory does not exist, it means BusinessWhatsApp is not installed.
-      return emitState(const BusinessWhatsAppState(appNotInstalled: true));
     }
+    return emitState(const BusinessWhatsAppState(appNotInstalled: true));
   }
 }

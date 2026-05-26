@@ -32,16 +32,12 @@ class _WhatsAppLayoutViewState extends State<WhatsAppLayoutView>
         builder: (BuildContext context, WhatsappState state) {
           if (state.appNotInstalled ?? false) {
             return const NotInstalledTextWidget(
+              icon: Icons.chat_bubble_outline_rounded,
               text: "Oops! WhatsApp is not installed on this device.",
             );
           } else if (state.isLoading ?? false) {
             return const Center(
               child: CircularProgressIndicator.adaptive(),
-            );
-          } else if (state.status.nullSafe.isEmpty) {
-            return const NotInstalledTextWidget(
-              text:
-                  "At the moment, there is no image or video status available.",
             );
           } else if (state.permissionDenied ?? false) {
             return PermissionDeniedWidget(
@@ -57,7 +53,8 @@ class _WhatsAppLayoutViewState extends State<WhatsAppLayoutView>
             );
           } else {
             return const NotInstalledTextWidget(
-              text: "Please wait...",
+              icon: Icons.image_not_supported_outlined,
+              text: "At the moment, there is no image or video status available.",
             );
           }
         },

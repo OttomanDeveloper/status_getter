@@ -75,48 +75,46 @@ mixin SocialDomainMixin {
     return _parseContent(content);
   }
 
-  /// This function is used to retrieve request details from a mobile device.
-  /// It makes a headless request using the InAppWebView package, providing a URL to initiate the request.
   Future<SiteModel?> _getMobile({required String url}) async {
-    // Completer to handle the asynchronous nature of the function
-    final Completer<SiteModel> model = Completer<SiteModel>();
+    final Completer<SiteModel> completer = Completer<SiteModel>();
+    late final HeadlessInAppWebView headless;
+    bool submitted = false;
 
-    // Using HeadlessInAppWebView for making headless requests
-    HeadlessInAppWebView(
-      // Setting for the web view
+    headless = HeadlessInAppWebView(
       initialSettings: InAppWebViewSettings(
         useOnLoadResource: true,
         mediaPlaybackRequiresUserGesture: false,
         javaScriptCanOpenWindowsAutomatically: true,
       ),
-      // Providing the initial URL request
       initialUrlRequest: URLRequest(url: WebUri('https://en.savefrom.net')),
-      // Callback triggered when the web view finishes loading
       onLoadStop: (InAppWebViewController controller, Uri? uri) async {
-        // Injecting JavaScript code to populate the form with the provided URL and trigger a click
+        if (submitted) return;
+        submitted = true;
+
         await controller.evaluateJavascript(source: '''
-        document.querySelector('#sf_url').value = '$url';
-        document.querySelector('#sf_submit').click();
-      ''');
+          document.querySelector('#sf_url').value = '$url';
+          document.querySelector('#sf_submit').click();
+        ''');
 
-        // Waiting for the web view to load and extracting HTML content
-        final SiteModel data = await Future<SiteModel>.delayed(
-          const Duration(seconds: 10),
-          () async {
-            final String? content = await controller.getHtml();
-            return _parseContent(content);
-          },
-        );
+        // Poll for results instead of a fixed 10s wait
+        for (int i = 0; i < 20; i++) {
+          await Future<void>.delayed(const Duration(milliseconds: 500));
+          final bool hasResult = await controller.evaluateJavascript(
+            source: "document.querySelector('.info-box') !== null",
+          ) as bool? ?? false;
+          if (hasResult) break;
+        }
 
-        // Completing the future with the extracted data
-        return model.complete(data);
+        final String? content = await controller.getHtml();
+        if (!completer.isCompleted) {
+          completer.complete(_parseContent(content));
+        }
+        await headless.dispose();
       },
-    )
-      ..run() // Running the headless web view
-      ..dispose(); // Disposing of the web view to free up resources
+    );
 
-    // Returning the future result to the client
-    return model.future;
+    await headless.run();
+    return completer.future;
   }
 
   /// This function parses HTML content to extract information about a video site,
